@@ -65,7 +65,7 @@ void Afficher_Epreuve_Par_Athlete (char *athlete) {
 }
 
 int main() {
-
+    int a,b,c;
     int choix;
     char athlete[MAX_LINE_LENGTH];
 
@@ -109,5 +109,5 @@ int main() {
 
     return 0;
 
-}tyftyftyfytfytftfuy
+}
 
