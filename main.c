@@ -53,7 +53,7 @@ void Definir_Resultat_Par_Athlete(const char *athlete) {
     FILE *fichier = fopen(nom_fichier, "a");
     if (fichier == NULL) {
         printf("Erreur pour ouvrir le fichier %s\n", athlete);
-        return;
+        exit(1);
     }
 
     char epreuve[MAX_LONGUEUR_SAISIE];
@@ -202,6 +202,8 @@ void Afficher_Epreuve_Par_Athlete (char *athlete) {
     }
 }
 
+
+
 int main() {
 
     int choix;
@@ -254,5 +256,4 @@ int main() {
     } while (choix != 4 );
 
     return 0;
-
-}
+    }
