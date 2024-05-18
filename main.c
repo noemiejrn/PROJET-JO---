@@ -9,7 +9,7 @@
 int valideDate(int jour, int mois, int annee)
 {
     // on verifie que le mois est compris entre 1 et 12 et que le jour est superieur a 1
-    if (annee < 0 || mois < 1 || mois > 12 || jour < 1)
+    if (annee < 2000|| mois < 1 || mois > 12 || jour < 1)
         return 0;
     // on teste que le jour n'excede pas 30 pour les mois de avril, juin, septembre et novembre
     if (mois == 4 || mois == 6 || mois == 9 || mois == 11) {
@@ -68,7 +68,7 @@ void Definir_Resultat_Par_Athlete(const char *athlete) {
 
         if(n_epreuve >= 1 && n_epreuve <= 5) {
 
-            printf("vous avez entré: %d \n", n_epreuve);
+            printf("vous avez entre \n);                                                                                                                                                   : %d \n", n_epreuve);
 
             do {
                 printf("Entrez la date (JJ/MM/AAAA): \n" );
