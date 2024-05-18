@@ -5,11 +5,18 @@
 #define MAX_LONGUEUR_FICHIER 50
 #define MAX_LONGUEUR_SAISIE 100
 
+// fonction pour vider la variable comme choix
+void viderBuffer(void)
+{
+    int c;
+    while((c=getchar()) != EOF && c != '\n');
+}
+
 // fonction pour verifier si la date est valide
 int valideDate(int jour, int mois, int annee)
 {
     // on verifie que le mois est compris entre 1 et 12 et que le jour est superieur a 1
-    if (annee < 2000|| mois < 1 || mois > 12 || jour < 1)
+    if (annee < 2000 || mois < 1 || mois > 12 || jour < 1)
         return 0;
     // on teste que le jour n'excede pas 30 pour les mois de avril, juin, septembre et novembre
     if (mois == 4 || mois == 6 || mois == 9 || mois == 11) {
@@ -51,10 +58,14 @@ void Definir_Resultat_Par_Athlete(const char *athlete) {
 
     char epreuve[MAX_LONGUEUR_SAISIE];
     char date[MAX_LONGUEUR_SAISIE];
-    char resultat[MAX_LONGUEUR_SAISIE];
+    float resultat ;
+
     int jour, mois, annee;
+    int heures,minutes;
+    float secondes;
     int n_epreuve ;
     int position ;
+    char temps[12];
 
     do {
 
@@ -66,29 +77,56 @@ void Definir_Resultat_Par_Athlete(const char *athlete) {
         printf("(5) relais \n");
         scanf("%d", &n_epreuve);
 
-        if(n_epreuve >= 1 && n_epreuve <= 5) {
+        if(n_epreuve >= 1 && n_epreuve <= 5 ) {
 
-            printf("vous avez entre \n);                                                                                                                                                   : %d \n", n_epreuve);
+            printf("vous avez entre: %d \n", n_epreuve);
 
             do {
                 printf("Entrez la date (JJ/MM/AAAA): \n" );
-                scanf("%d/%d/%d", &jour, &mois, &annee);
+                scanf("%2d/%2d/%4d", &jour, &mois, &annee);
 
                 if(valideDate(jour, mois, annee)){
-                    // printf("la date est: %d/%d/%d \n",jour, mois, annee);
-                    sprintf(date, "%d/%d/%d", jour, mois, annee);
+                    // on formate la date comme JJ/MM/AAAA
+                    sprintf(date, "%02d/%02d/%d", jour, mois, annee);
                 }else{
-                    printf("erreur! Entrer une nouvelle date \n");
+                    printf("Erreur! Entrer une nouvelle date \n");
+                    viderBuffer();
                 }
             } while (valideDate(jour, mois, annee)==0);
 
             if (n_epreuve == 5) {
-                printf("Entrez la position de l'athlete dans le relais: ");
-                scanf("%d",&position);
+                do {
+                    printf("Entrez la position de l'athlete dans le relais: ");
+                    scanf("%d", &position);
+                    if (position >= 1 && position <= 4) {
+                        printf("la position de l'athlete est %d \n", position);
+                    } else {
+                        printf("Erreur! Entrez une position valide \n");
+                        viderBuffer();
+                    }
+                }while(position < 1 || position > 4);
             }
+            // capture du temps et sa conversion en minutes
 
-            printf("Entrez le resultat: ");
-            scanf("%s", resultat);
+            do{
+                printf("Entrez le temps en hh:mm:ss.ss  \n ");
+                scanf("%s",temps);
+                sscanf(temps,"%2d:%2d:%f",&heures, &minutes, &secondes);
+
+                if( heures >= 0 && heures <= 23 &&
+                    minutes >=0 && minutes <= 59 &&
+                    secondes >= 0 && secondes <= 59.99){
+                    printf("le temps est de %2d:%2d:%f \n",heures, minutes, secondes);
+                    resultat = heures * 3600 + minutes * 60 + secondes;
+
+                }else{
+                    printf("Erreur! Entrez un nouveau temps \n");
+                    viderBuffer();
+                }
+
+            } while(heures < 0 || heures > 23 ||
+                    minutes < 0 || minutes > 59 ||
+                    secondes < 0 || secondes > 59.99);
 
             switch(n_epreuve){
                 case 1 :
@@ -110,15 +148,18 @@ void Definir_Resultat_Par_Athlete(const char *athlete) {
 
             if (n_epreuve == 5)
                 // on ajoute la ligne athlete;date;epreuve;position;resultat;
-                fprintf(fichier, "%s;%s;%s;%d;%s;\n", athlete, date, epreuve,position, resultat);
-                // on ajoute la ligne athlete;date;epreuve;resultat;
-            else fprintf(fichier, "%s;%s;%s;%s;\n", athlete, date, epreuve, resultat);
+                fprintf(fichier, "%s;%s;%s;%d;%f;\n", athlete, date, epreuve,position, resultat);
+                // on ajoute la ligne athlete;date;epreuve;;resultat;
+            else fprintf(fichier, "%s;%s;%s; ;%f;\n", athlete, date, epreuve, resultat);
 
             fclose(fichier);
-            printf("Resultat pour %s dans %s est de %s\n", athlete, epreuve, resultat);
+
+            printf("Resultat pour %s dans %s est de %f secondes \n", athlete, epreuve, resultat);
+            return;
 
         }else{
-            printf("erreur! le nombre entre n'est pas une proposition \n");
+            printf("Erreur! le nombre entre n'est pas une proposition \n");
+            viderBuffer();
         }
     } while (n_epreuve > 5);
 }
@@ -127,7 +168,7 @@ void Afficher_Epreuve_Par_Athlete (char *athlete) {
 
     FILE* fichier = NULL;
     char c;
-    char nom_fichier [250];
+    char nom_fichier [MAX_LONGUEUR_SAISIE];
 
     // on copie le nom de l'athlete dans la variable nom_fichier
     strcpy(nom_fichier,athlete);
@@ -138,13 +179,22 @@ void Afficher_Epreuve_Par_Athlete (char *athlete) {
     fichier = fopen(nom_fichier, "r");
 
     if (fichier != NULL)
+
     {
+        // Afficher les entetes du tableau
+        printf("| Athlete | Date | Epreuve | Position | Result |\n");
+        printf("| ");
+
         // Boucle de lecture des caractères un à un tant qu'on n'est pas a la fin du fichier
         do
         {
             c = fgetc(fichier); // On lit le caractère
+            // on remplace ; par |
             if (c == ';') printf(" | ");
+                // sinon affiche le caractere
             else printf("%c", c);
+            // on affiche | en debut de ligne
+            if (c == '\n') printf("| ");
 
         } while (c != EOF);
 
@@ -197,6 +247,7 @@ int main() {
 
             default:
                 printf("ce choix n'est pas possible \n");
+                viderBuffer();
                 break;
         }
 
