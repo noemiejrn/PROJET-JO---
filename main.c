@@ -61,11 +61,14 @@ void Definir_Resultat_Par_Athlete(const char *athlete) {
     float resultat ;
 
     int jour, mois, annee;
-    int heures,minutes;
-    float secondes;
+    int heures = -1;
+    int minutes = -1;
+    float secondes = -1;
     int n_epreuve ;
     int position ;
     char temps[12];
+
+
 
     do {
 
@@ -111,7 +114,7 @@ void Definir_Resultat_Par_Athlete(const char *athlete) {
             do{
                 printf("Entrez le temps en hh:mm:ss.ss  \n ");
                 scanf("%s",temps);
-                sscanf(temps,"%2d:%2d:%f",&heures, &minutes, &secondes);
+                sscanf(temps,"%d:%d:%f",&heures, &minutes, &secondes);
 
                 if( heures >= 0 && heures <= 23 &&
                     minutes >=0 && minutes <= 59 &&
