@@ -163,7 +163,9 @@ void Definir_Resultat_Par_Athlete(const char *athlete) {
     char date[MAX_LONGUEUR_SAISIE];
     float resultat ;
 
-    int jour, mois, annee;
+    int jour = -1;
+    int mois = -1;
+    int annee = -1;
     int heures = -1;
     int minutes = -1;
     float secondes = -1;
