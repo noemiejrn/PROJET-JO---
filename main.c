@@ -4,10 +4,89 @@
 
 #define MAX_LONGUEUR_FICHIER 50
 #define MAX_LONGUEUR_SAISIE 100
+
+typedef struct {
+    int jour;
+    int mois;
+    int annee;
+} Date;
+
+typedef struct {
+    char nom[50];
+    Date date;
+    char epreuve[50];
+    float temps;
+} Athlete;
+
 typedef struct {
     char *nom;
     float moyenne;
 }AthleteMoyenne;
+
+void tri_insertion(Athlete arr[], int n) {
+    int i, j;
+    Athlete key;
+    for (i = 1; i < n; i++) {
+        key = arr[i];
+        j = i - 1;
+
+        // Comparer les dates
+        while (j >= 0 &&
+               (arr[j].date.annee > key.date.annee ||
+                (arr[j].date.annee == key.date.annee && arr[j].date.mois > key.date.mois) ||
+                (arr[j].date.annee == key.date.annee && arr[j].date.mois == key.date.mois && arr[j].date.jour > key.date.jour))) {
+            arr[j + 1] = arr[j];
+            j = j - 1;
+        }arr[j + 1] = key;
+    }
+}
+
+void tridate_1athlete(const char *fichier_entree_nom) {
+    const char *fichier_sortie_nom = "fichier_tri.txt";
+    FILE *fichier_entree = fopen(fichier_entree_nom, "r");
+    if (fichier_entree == NULL) {
+        perror("Erreur lors de l'ouverture du fichier d'entrée");
+        exit(2);
+    }
+
+    Athlete fiches[100];
+    int i = 0;
+    char ligne[200];
+
+    while (fgets(ligne, sizeof(ligne), fichier_entree)) {
+        if (sscanf(ligne, "%49[^|]| %d/%d/%d | %49[^|]| %f",
+                   fiches[i].nom,
+                   &fiches[i].date.jour,
+                   &fiches[i].date.mois,
+                   &fiches[i].date.annee,
+                   fiches[i].epreuve,
+                   &fiches[i].temps) == 6) {
+            i++;
+        }
+    }
+    fclose(fichier_entree);
+
+    // Trier les fiches par date en utilisant le tri par insertion
+    tri_insertion(fiches, i);
+
+    FILE *fichier_sortie = fopen(fichier_sortie_nom, "w");
+    if (fichier_sortie == NULL) {
+        perror("Erreur lors de l'ouverture du fichier de sortie");
+        exit(2);
+    }
+
+    for (int k = 0; k < i; k++) {
+        fprintf(fichier_sortie, "%s | %d/%d/%d | %s | %.2f\n",
+                fiches[k].nom,
+                fiches[k].date.jour,
+                fiches[k].date.mois,
+                fiches[k].date.annee,
+                fiches[k].epreuve,
+                fiches[k].temps);
+    }
+    fclose(fichier_sortie);
+}
+
 
 void verifsauvegarde (char *athlete){
     FILE*fichier;
@@ -466,7 +545,7 @@ int main() {
             case 2 /* Voir Historiques */:
                 printf("saisir nom de l'athele:");
                 scanf("%s",athlete);
-                Afficher_Epreuve_Par_Athlete (athlete);
+                tridate_1athlete(athlete);
                 break;
 
         case 3 /* Voir Statistiques */:
