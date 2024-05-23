@@ -163,9 +163,10 @@ void Definir_Resultat_Par_Athlete(const char *athlete) {
     char date[MAX_LONGUEUR_SAISIE];
     float resultat ;
 
-    int jour = -1;
-    int mois = -1;
-    int annee = -1;
+    Date date;
+    date.jour = -1;
+    date.mois = -1;
+    date.annee = -1;
     int heures = -1;
     int minutes = -1;
     float secondes = -1;
@@ -194,16 +195,16 @@ void Definir_Resultat_Par_Athlete(const char *athlete) {
 
             do {
                 printf("Entrez la date (JJ/MM/AAAA): \n" );
-                scanf("%2d/%2d/%4d", &jour, &mois, &annee);
+                scanf("%2d/%2d/%4d", &date.jour, &date.mois, &date.annee);
 
                 if(valideDate(jour, mois, annee)){
                     // on formate la date comme JJ/MM/AAAA
-                    sprintf(date, "%02d/%02d/%d", jour, mois, annee);
+                    sprintf(date, "%02d/%02d/%d", date.jour, date.mois, date.annee);
                 }else{
                     printf("Erreur! Entrer une nouvelle date \n");
                     viderBuffer();
                 }
-            } while (valideDate(jour, mois, annee)==0);
+            } while (valideDate(date.jour, date.mois, date.annee)==0);
 
             if (n_epreuve == 5) {
                 do {
@@ -259,9 +260,9 @@ void Definir_Resultat_Par_Athlete(const char *athlete) {
 
             if (n_epreuve == 5)
                 // on ajoute la ligne athlete;date;epreuve;position;resultat;
-                fprintf(fichier, "%s;%s;%s;%d;%f;\n", athlete, date, epreuve,position, resultat);
+                fprintf(fichier, "%s;%d/%d/%d;%s;%d;%f;\n", athlete, date.jour, date.mois, date.annee, epreuve,position, resultat);
                 // on ajoute la ligne athlete;date;epreuve;;resultat;
-            else fprintf(fichier, "%s;%s;%s; ;%f;\n", athlete, date, epreuve, resultat);
+            else fprintf(fichier, "%s;%d/%d/%d;%s; ;%f;\n", athlete, date.jour, date.mois, date.annee, epreuve, resultat);
 
             fclose(fichier);
 
