@@ -54,7 +54,7 @@ void tridate_1athlete(const char *fichier_entree_nom) {
     char ligne[200];
 
     while (fgets(ligne, sizeof(ligne), fichier_entree)) {
-        if (sscanf(ligne, "%49[^|]| %d/%d/%d | %49[^|]| %f",
+        if (sscanf(ligne, "%49[^;]; %d/%d/%d ; %49[^;]; %f",
                    fiches[i].nom,
                    &fiches[i].date.jour,
                    &fiches[i].date.mois,
