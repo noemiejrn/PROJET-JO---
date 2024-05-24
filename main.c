@@ -45,98 +45,45 @@ void tridate_1athlete(const char *fichier_entree_nom) {
 
     printf("test -1\n");
     const char *fichier_sortie_nom = "fichier_tri.txt";
-
     FILE *fichier_entree = fopen(fichier_entree_nom, "r");
-
     if (fichier_entree == NULL) {
-
         perror("Erreur lors de l'ouverture du fichier d'entrée");
-
         exit(2);
-
     }
-
-
-
     Athlete fiches[100];
-
     int i = 0;
-
     char ligne[200];
-
-
-
-
-
     while (fgets(ligne, 199, fichier_entree)) {
-
         if (sscanf(ligne, "%49s %d/%d/%d %49s %f",
-
                    fiches[i].nom,
-
                    &fiches[i].date.jour,
-
                    &fiches[i].date.mois,
-
                    &fiches[i].date.annee,
-
                    fiches[i].epreuve,
-
                    &fiches[i].temps) == 6) {
-
             i++;
-
         }
-
     }
-
-
-
     fclose(fichier_entree);
 
-
-
     // Trier les fiches par date en utilisant le tri par insertion
-
     tri_insertion(fiches, i);
-
-
-
     FILE *fichier_sortie = fopen(fichier_sortie_nom, "w");
-
     if (fichier_sortie == NULL) {
-
         perror("Erreur lors de l'ouverture du fichier de sortie");
-
         exit(2);
-
     }
-
-
-
     for (int k = 0; k < i; k++) {
-
         fprintf(fichier_sortie, "%s | %d/%d/%d | %s | %.2f\n",
-
                 fiches[k].nom,
-
                 fiches[k].date.jour,
-
                 fiches[k].date.mois,
-
                 fiches[k].date.annee,
-
                 fiches[k].epreuve,
-
                 fiches[k].temps);
-
     }
-
     fclose(fichier_sortie);
-
 }
-
-
 
 
 void verifsauvegarde (char *athlete){
@@ -638,12 +585,10 @@ int main() {
                     exit(1);
                 }
                 Date date1;
-
                 Date date2;
-
                 int n_epreuve;
 
-                //pour les 2 dates, demander à l'utilisateur de les entrer de la forme jj/AA/MMAA,
+
                 printf("Entrez l'epreuve: \n");
                 printf("(1) 100m \n");
                 printf("(2) 400m \n");
@@ -652,92 +597,183 @@ int main() {
                 printf("(5) relais \n");
                 scanf("%d", &n_epreuve);
                 switch(n_epreuve) {
-                    case 1 :
+                    case 1 /* 100m */:
+                        //on nomme la chaîne de caractère épreuve en fonction du choix de l'épreuve
                         strcpy(epreuve, "100m");
                         printf("vous avez choisi l'épreuve %s", epreuve);
 
-                        printf("connaître les stats de l'athlète %s pour l'épreuve %s\n", athlete, epreuve);
-
+                        printf("Les statistiques de l'athlète %s pour l'épreuve %s:\n", athlete, epreuve);
                         afficheSatistique(athlete, epreuve);
-                       /* printf(" Connaître les 3 meilleurs athletes à l'épreuve %s \n", epreuve);
-                        Meilleurs_Athletes(epreuve);
-                        printf("entrez 2 dates pour observer les différences de temps");
-                        scanf("%s", date1);
-                        scanf("%s", date2);
-                        printf(" Avoir la progression de l'athlete %s entre 2 dates à l'épreuve %s \n", athlete,
-                               epreuve);
-                        //differenceTempsDates(athlete, epreuve, date1, date2);*/
 
+                       printf(" Connaître les 3 meilleurs athlètes à l'épreuve %s: \n", epreuve);
+                        Meilleurs_Athletes(epreuve);
+
+                        do {
+                            printf("Entrez la date (JJ/MM/AAAA) que vous voulez observer: \n" );
+                            scanf("%2d/%2d/%4d", &date1.jour, &date1.mois, &date1.annee);
+
+                            if(valideDate(date1.jour, date1.mois, date1.annee)){
+                                // on formate la date comme JJ/MM/AAAA
+                                do {
+                                    printf("Entrez la deuxième date (JJ/MM/AAAA) à laquelle vous voulez observer la différence de temps avec la première: \n" );
+                                    scanf("%2d/%2d/%4d", &date2.jour, &date2.mois, &date2.annee);
+
+                                    if(valideDate(date2.jour, date2.mois, date2.annee)){
+                                        // on formate la date comme JJ/MM/AAAA
+                                        differenceTempsDates(athlete, epreuve, date1, date2);
+                                    }else{
+                                        printf("Erreur! Entrer une nouvelle date \n");
+                                        viderBuffer();
+                                    }
+                                } while (valideDate(date2.jour, date2.mois, date2.annee)==0);
+                            }else{
+                                printf("Erreur! Entrer une nouvelle date \n");
+                                viderBuffer();
+                            }
+                        } while (valideDate(date2.jour, date2.mois, date2.annee)==0);
                         break;
-                    case 2 :
+
+                    case 2 /* 400m */:
+                        //on nomme la chaîne de caractère épreuve en fonction du choix de l'épreuve
                         strcpy(epreuve, "400m");
                         printf("vous avez choisi l'épreuve %s", epreuve);
 
-
-                        printf("connaître les stats de l'athlète %s pour l'épreuve %s\n", athlete, epreuve);
-
+                        printf("Les statistiques de l'athlète %s pour l'épreuve %s:\n", athlete, epreuve);
                         afficheSatistique(athlete, epreuve);
-                        printf(" Connaître les 3 meilleurs athletes à l'épreuve %s \n", epreuve);
-                        Meilleurs_Athletes(epreuve);
-                        printf("entrez 2 dates pour observer les différences de temps");
-                        scanf("%d %d %d", &date1.jour, &date1.mois, &date1.annee);
-                        int a= valideDate(date1.jour, date1.mois, date1.annee);
-                        scanf("%d %d %d", &date2.jour, &date2.mois, &date2.annee);
-                        int b= valideDate(date2.jour, date2.mois, date2.annee);
 
-                        printf(" Avoir la progression de l'athlete %s entre 2 dates à l'épreuve %s \n", athlete,
-                               epreuve);
-                        differenceTempsDates(athlete, epreuve, date1, date2);
+                        printf(" Connaître les 3 meilleurs athlètes à l'épreuve %s: \n", epreuve);
+                        Meilleurs_Athletes(epreuve);
+
+                        do {
+                            printf("Entrez la date (JJ/MM/AAAA) que vous voulez observer: \n" );
+                            scanf("%2d/%2d/%4d", &date1.jour, &date1.mois, &date1.annee);
+
+                            if(valideDate(date1.jour, date1.mois, date1.annee)){
+                                // on formate la date comme JJ/MM/AAAA
+                                do {
+                                    printf("Entrez la deuxième date (JJ/MM/AAAA) à laquelle vous voulez observer la différence de temps avec la première: \n" );
+                                    scanf("%2d/%2d/%4d", &date2.jour, &date2.mois, &date2.annee);
+
+                                    if(valideDate(date2.jour, date2.mois, date2.annee)){
+                                        // on formate la date comme JJ/MM/AAAA
+                                        differenceTempsDates(athlete, epreuve, date1, date2);
+                                    }else{
+                                        printf("Erreur! Entrer une nouvelle date \n");
+                                        viderBuffer();
+                                    }
+                                } while (valideDate(date2.jour, date2.mois, date2.annee)==0);
+                            }else{
+                                printf("Erreur! Entrer une nouvelle date \n");
+                                viderBuffer();
+                            }
+                        } while (valideDate(date2.jour, date2.mois, date2.annee)==0);
                         break;
-                    case 3 :
+
+                    case 3 /* 5000m */:
+                        //on nomme la chaîne de caractère épreuve en fonction du choix de l'épreuve
                         strcpy(epreuve, "5000m");
                         printf("vous avez choisi l'épreuve %s", epreuve);
 
-
-                        printf("connaître les stats de l'athlète %s pour l'épreuve %s\n", athlete, epreuve);
-
+                        printf("Les statistiques de l'athlète %s pour l'épreuve %s:\n", athlete, epreuve);
                         afficheSatistique(athlete, epreuve);
-                        /*printf(" Connaître les 3 meilleurs athletes à l'épreuve %s \n", epreuve);
+
+                        printf(" Connaître les 3 meilleurs athletes à l'épreuve %s: \n", epreuve);
                         Meilleurs_Athletes(epreuve);
-                        printf("entrez 2 dates pour observer les différences de temps");
-                        scanf("%s", date1);
-                        scanf("%s", date2);
-                        printf(" Avoir la progression de l'athlete %s entre 2 dates à l'épreuve %s \n", athlete,
-                               epreuve);
-                        //differenceTempsDates(athlete, epreuve, date1, date2);*/
+
+                        do {
+                            printf("Entrez la date (JJ/MM/AAAA) que vous voulez observer: \n" );
+                            scanf("%2d/%2d/%4d", &date1.jour, &date1.mois, &date1.annee);
+
+                            if(valideDate(date1.jour, date1.mois, date1.annee)){
+                                // on formate la date comme JJ/MM/AAAA
+                                do {
+                                    printf("Entrez la deuxième date (JJ/MM/AAAA) à laquelle vous voulez observer la différence de temps avec la première: \n" );
+                                    scanf("%2d/%2d/%4d", &date2.jour, &date2.mois, &date2.annee);
+
+                                    if(valideDate(date2.jour, date2.mois, date2.annee)){
+                                        // on formate la date comme JJ/MM/AAAA
+                                        differenceTempsDates(athlete, epreuve, date1, date2);
+                                    }else{
+                                        printf("Erreur! Entrer une nouvelle date \n");
+                                        viderBuffer();
+                                    }
+                                } while (valideDate(date2.jour, date2.mois, date2.annee)==0);
+                            }else{
+                                printf("Erreur! Entrer une nouvelle date \n");
+                                viderBuffer();
+                            }
+                        } while (valideDate(date2.jour, date2.mois, date2.annee)==0);
                         break;
-                    case 4 :
+
+                    case 4 /* marathon */:
+                        //on nomme la chaîne de caractère épreuve en fonction du choix de l'épreuve
                         strcpy(epreuve, "marathon");
                         printf("vous avez choisi l'épreuve %s", epreuve);
 
-
-                        printf("connaître les stats de l'athlète %s pour l'épreuve %s\n", athlete, epreuve);
-
+                        printf("Les statistiques de l'athlète %s pour l'épreuve %s:\n", athlete, epreuve);
                         afficheSatistique(athlete, epreuve);
-                        printf(" Connaître les 3 meilleurs athletes à l'épreuve %s \n", epreuve);
+
+                        printf(" Connaître les 3 meilleurs athletes à l'épreuve %s: \n", epreuve);
                         Meilleurs_Athletes(epreuve);
-                        printf("entrez 2 dates pour observer les différences de temps");
-                        scanf("%s", date1);
-                        scanf("%s", date2);
-                        printf(" Avoir la progression de l'athlete %s entre 2 dates à l'épreuve %s \n", athlete,
-                               epreuve);
-                        //differenceTempsDates(athlete, epreuve, date1, date2);
+
+                        do {
+                            printf("Entrez la date (JJ/MM/AAAA) que vous voulez observer: \n" );
+                            scanf("%2d/%2d/%4d", &date1.jour, &date1.mois, &date1.annee);
+
+                            if(valideDate(date1.jour, date1.mois, date1.annee)){
+                                // on formate la date comme JJ/MM/AAAA
+                                do {
+                                    printf("Entrez la deuxième date (JJ/MM/AAAA) à laquelle vous voulez observer la différence de temps avec la première: \n" );
+                                    scanf("%2d/%2d/%4d", &date2.jour, &date2.mois, &date2.annee);
+
+                                    if(valideDate(date2.jour, date2.mois, date2.annee)){
+                                        // on formate la date comme JJ/MM/AAAA
+                                        differenceTempsDates(athlete, epreuve, date1, date2);
+                                    }else{
+                                        printf("Erreur! Entrer une nouvelle date \n");
+                                        viderBuffer();
+                                    }
+                                } while (valideDate(date2.jour, date2.mois, date2.annee)==0);
+                            }else{
+                                printf("Erreur! Entrer une nouvelle date \n");
+                                viderBuffer();
+                            }
+                        } while (valideDate(date2.jour, date2.mois, date2.annee)==0);
                         break;
-                    case 5 :
+
+                    case 5 /* relais */:
+                        //on nomme la chaîne de caractère épreuve en fonction du choix de l'épreuve
                         strcpy(epreuve, "relais");
                         printf("vous avez choisi l'épreuve %s", epreuve);
 
-
-                        printf("connaître les stats de l'athlète %s pour l'épreuve %s\n", athlete, epreuve);
-
+                        printf("Les statistiques de l'athlète %s pour l'épreuve %s:\n", athlete, epreuve);
                         afficheSatistique(athlete, epreuve);
-                        printf("entrez 2 dates pour observer les différences de temps");
-                        scanf("%s", date1);
-                        scanf("%s", date2);
-                        printf(" Avoir la progression de l'athlete %s entre 2 dates à l'épreuve %s \n", athlete,
-                               epreuve);
-                        //differenceTempsDates(athlete, epreuve, date1, date2);
+
+                        do {
+                            printf("Entrez la date (JJ/MM/AAAA) que vous voulez observer: \n" );
+                            scanf("%2d/%2d/%4d", &date1.jour, &date1.mois, &date1.annee);
+
+                            if(valideDate(date1.jour, date1.mois, date1.annee)){
+                                // on formate la date comme JJ/MM/AAAA
+                                do {
+                                    printf("Entrez la deuxième date (JJ/MM/AAAA) à laquelle vous voulez observer la différence de temps avec la première: \n" );
+                                    scanf("%2d/%2d/%4d", &date2.jour, &date2.mois, &date2.annee);
+
+                                    if(valideDate(date2.jour, date2.mois, date2.annee)){
+                                        // on formate la date comme JJ/MM/AAAA
+                                        differenceTempsDates(athlete, epreuve, date1, date2);
+                                    }else{
+                                        printf("Erreur! Entrer une nouvelle date \n");
+                                        viderBuffer();
+                                    }
+                                } while (valideDate(date2.jour, date2.mois, date2.annee)==0);
+                            }else{
+                                printf("Erreur! Entrer une nouvelle date \n");
+                                viderBuffer();
+                            }
+                        } while (valideDate(date2.jour, date2.mois, date2.annee)==0);
                         break;
+
                     default:
                         printf("ce choix n'est pas possible \n");
                         break;
