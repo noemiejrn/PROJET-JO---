@@ -327,7 +327,7 @@ float * statistique ( char *athlete,  char *epreuve) {
     top_athlete.nom=athlete;
     top_athlete.moyenne=tab[2];
     FILE*fichier= fopen("statistiquess.txt","r+");
-    fprintf(fichier,"%s %f\n",top_athlete.nom,top_athlete.moyenne);
+    fprintf(fichier,"%s %s %f\n",top_athlete.nom, epreuve ,top_athlete.moyenne);
     fclose(fichier);
     free(a);
 
