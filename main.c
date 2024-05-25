@@ -11,15 +11,15 @@ typedef struct {
     int annee;
 } Date;
 
-typedef struct {
+typedef struct{
     char nom[50];
     Date date;
     char epreuve[50];
     float temps;
-} Athlete;
+}Athlete;
 
-typedef struct {
-    char nom[50];
+typedef struct{
+    char *nom;
     float moyenne;
 }AthleteMoyenne;
 
@@ -140,6 +140,32 @@ int valideDate(int jour, int mois, int annee)
     return 1;
 }
 
+// fonction pour verifier si un relais existe deja a une date pour un athlete
+int relais_existe(char *nom_fichier, char *date, char *athlete){
+
+    char ligne[MAX_LONGUEUR_SAISIE];
+    char fichier_athlete[MAX_LONGUEUR_SAISIE];
+    char fichier_date[MAX_LONGUEUR_SAISIE];
+    char fichier_epreuve[MAX_LONGUEUR_SAISIE];
+
+    FILE *fichier = fopen(nom_fichier, "r");
+    if (fichier == NULL) {
+        printf("Erreur pour ouvrir le fichier %s\n", athlete);
+        exit(1);
+    }
+
+    while (fgets(ligne, sizeof(ligne), fichier) != NULL) {
+        sscanf(ligne, "%s %s %s", fichier_athlete, fichier_date, fichier_epreuve);
+
+        if (strcmp(fichier_date, date) == 0 && strcmp(fichier_epreuve, "relais") == 0) {
+            fclose(fichier);
+            return 1;
+        }
+    }
+    fclose(fichier);
+   return 0;
+}
+
 // fonction pour entrer un resultat pour un athlete
 void Definir_Resultat_Par_Athlete(const char *athlete) {
 
@@ -168,11 +194,9 @@ void Definir_Resultat_Par_Athlete(const char *athlete) {
     int heures = -1;
     int minutes = -1;
     float secondes = -1;
-    int n_epreuve ;
-    int position ;
+    int n_epreuve = -1 ;
+    int position = -1 ;
     char temps[12];
-
-
 
     verifsauvegarde(nom_fichier);
     do {
@@ -193,16 +217,23 @@ void Definir_Resultat_Par_Athlete(const char *athlete) {
 
             do {
                 printf("Entrez la date (JJ/MM/AAAA): \n" );
-                scanf("%2d/%2d/%4d", &dates.jour, &dates.mois, &dates.annee);
+                scanf("%d/%d/%d", &dates.jour, &dates.mois, &dates.annee);
 
                 if(valideDate(dates.jour, dates.mois, dates.annee)){
                     // on formate la date comme JJ/MM/AAAA
-                    sprintf(date, "%02d/%02d/%d", dates.jour, dates.mois, dates.annee);
+                    sprintf(date, "%d/%d/%d", dates.jour, dates.mois, dates.annee);
+
+                    if(relais_existe(nom_fichier, date, athlete) ==1) {
+                        printf("il existe deja un relais a cette date \n");
+                        viderBuffer();
+                    }
+
                 }else{
                     printf("Erreur! Entrer une nouvelle date \n");
                     viderBuffer();
                 }
-            } while (valideDate(dates.jour, dates.mois, dates.annee)==0);
+            } while ((valideDate(dates.jour, dates.mois, dates.annee)==0) || (relais_existe(nom_fichier, date, athlete) ==1));
+
 
             if (n_epreuve == 5) {
                 do {
@@ -220,12 +251,14 @@ void Definir_Resultat_Par_Athlete(const char *athlete) {
 
             do{
                 printf("Entrez le temps en hh:mm:ss.ss  \n ");
-                scanf("%s",temps);
+                scanf("%11s",temps);
                 sscanf(temps,"%d:%d:%f",&heures, &minutes, &secondes);
 
                 if( heures >= 0 && heures <= 23 &&
                     minutes >=0 && minutes <= 59 &&
-                    secondes >= 0 && secondes <= 59.99){
+                    secondes >= 0 && secondes <= 59.99 &&
+                    temps[8] == '.' && temps[2] == ':' &&
+                    temps[5] == ':'){
                     printf("le temps est de %2d:%2d:%f \n",heures, minutes, secondes);
                     resultat = heures * 3600 + minutes * 60 + secondes;
 
@@ -236,7 +269,9 @@ void Definir_Resultat_Par_Athlete(const char *athlete) {
 
             } while(heures < 0 || heures > 23 ||
                     minutes < 0 || minutes > 59 ||
-                    secondes < 0 || secondes > 59.99);
+                    secondes < 0 || secondes > 59.99 ||
+                    temps[8] != '.' || temps[2] != ':' ||
+                    temps[5] != ':');
 
             switch(n_epreuve){
                 case 1 :
@@ -257,9 +292,9 @@ void Definir_Resultat_Par_Athlete(const char *athlete) {
             }
 
             if (n_epreuve == 5)
-                // on ajoute la ligne athlete;date;epreuve;position;resultat;
+                // on ajoute la ligne athlete date epreuve position resultat;
                 fprintf(fichier, "%s %d/%d/%d %s %d %f\n", athlete, dates.jour, dates.mois, dates.annee, epreuve,position, resultat);
-                // on ajoute la ligne athlete;date;epreuve;;resultat;
+                // on ajoute la ligne athlete date epreuve  resultat;
             else fprintf(fichier, "%s %d/%d/%d %s %f\n", athlete, dates.jour, dates.mois, dates.annee, epreuve, resultat);
 
             fclose(fichier);
@@ -271,46 +306,10 @@ void Definir_Resultat_Par_Athlete(const char *athlete) {
             printf("Erreur! le nombre entre n'est pas une proposition \n");
             viderBuffer();
         }
-    } while (n_epreuve > 5);
+    } while (n_epreuve < 1 || n_epreuve > 5);
 }
 
-void Afficher_Epreuve_Par_Athlete (char *athlete) {
 
-    FILE* fichier = NULL;
-    char c;
-    char nom_fichier [MAX_LONGUEUR_SAISIE];
-
-    // on copie le nom de l'athlete dans la variable nom_fichier
-    strcpy(nom_fichier,athlete);
-
-    // on ajoute .txt a la fin de nom_fichier
-    strcat(nom_fichier,".txt");
-
-    fichier = fopen(nom_fichier, "r");
-
-    if (fichier != NULL)
-
-    {
-        // Afficher les entetes du tableau
-        printf("| Athlete | Date | Epreuve | Position | Result |\n");
-        printf("| ");
-
-        // Boucle de lecture des caractères un à un tant qu'on n'est pas a la fin du fichier
-        do
-        {
-            c = fgetc(fichier); // On lit le caractère
-            // on remplace ; par |
-            if (c == ' ') printf(" | ");
-                // sinon affiche le caractere
-            else printf("%c", c);
-            // on affiche | en debut de ligne
-            if (c == '\n') printf("| ");
-
-        } while (c != EOF);
-
-        fclose(fichier);
-    }
-}
 
 float * recupererdonnees(char *athlete, char *epreuve) {
     FILE *fichier = NULL;
@@ -382,7 +381,6 @@ void triInsertion(float A[], int n) {
         A[decalage + 1] = temp;
     }
 }
-
 
 float * statistique ( char *athlete,  char *epreuve) {
 
@@ -543,12 +541,9 @@ int main() {
         FILE *statistiquessmarathon = fopen("statistiquessmarathon.txt", "w");
         fclose(statistiquessmarathon);
     }
-    int choix;
+    int choix = -1;
     char athlete[MAX_LONGUEUR_SAISIE];
 
-    printf("\033c" );
-
-    // on affiche le menu tant que choix est different de 4
 
     do {
         // on affiche le menu principal
@@ -790,7 +785,7 @@ int main() {
                 break;
         }
 
-    } while (choix != 4 );
+    } while (choix < 1 || choix > 4);
 
     return 0;
 
