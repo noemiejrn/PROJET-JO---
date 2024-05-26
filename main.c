@@ -506,7 +506,7 @@ float * recupererdonnees1(char *athlete, char *epreuve) {
 
             }
         }
-//on crée un tableau qui sera composé des temps de l'athlète en allouant l'espace en fonction du nombre de ligne du fichier
+        //on crée un tableau qui sera composé des temps de l'athlète en allouant l'espace en fonction du nombre de ligne du fichier
         float *chronos = malloc((i ) * sizeof(float));
         if (chronos == NULL) {
             printf("erreur d'allocation de la mémoire\n");
@@ -521,11 +521,11 @@ float * recupererdonnees1(char *athlete, char *epreuve) {
         }
         fclose(fichier);
         return chronos;
-    }else{
+        }else{
         fclose(fichier);
         exit(1);
+        }
     }
-}
 
 // Procédure de tri par insertion pour trier les chronos
 void triInsertion(float A[], int n) {
@@ -545,21 +545,21 @@ void triInsertion(float A[], int n) {
     }
 }
 
-//fonction qui permet de connaître le calculer, la moyenne, trouver le meilleur et le pire temps
+//fonction qui permet de connaître le calculer, la moyenne, trouver le meilleur et le pire temps hors relais
 float * statistique ( char *athlete,  char *epreuve) {
-//on récupère le tableau de chronos dans la fonction récupérer données
+    //on récupère le tableau de chronos dans la fonction récupérer données
     float *a = recupererdonnees(athlete, epreuve);
     int taille = (int)a[0];
-//on appelle la procédure pour trier le tableau de chronos
+    //on appelle la procédure pour trier le tableau de chronos
     triInsertion(a + 1, taille-1);
-//on calcule la moyenne
+    //on calcule la moyenne
     float moyenne = 0;
     for (int i = 1; i < taille; i++) {
         moyenne += a[i];
     }
-    float vraimoyenne = moyenne / 2;
+    float vraimoyenne = moyenne / (taille-1);
 
-//on crée un tableau dans lequel on rentrera le pire et le meilleur temps et la moyenne
+    //on crée un tableau dans lequel on rentrera le pire et le meilleur temps et la moyenne
     float *tab = malloc(3 * sizeof(float));
     //le pire temps
     tab[0]=a[taille-1];
@@ -606,19 +606,17 @@ float * statistique ( char *athlete,  char *epreuve) {
             break;
         }
     }
-
-//on entre les valeurs dans le fichier (le nom et la moyenne)
-if(found==0){
+    //on entre les valeurs dans le fichier (le nom et la moyenne)
+    if(found==0){
     fprintf(fichier,"%s %f\n",top_athlete.nom ,top_athlete.moyenne);
-}
-
+    }
     fclose(fichier);
     free(a);
 
     return tab;
 }
 
-//fonction qui permet de connaître le calculer, la moyenne, trouver le meilleur et le pire temps
+//fonction qui permet de connaître le calculer, la moyenne, trouver le meilleur et le pire temps du relais
 float * statistique1 ( char *athlete,  char *epreuve) {
 //on récupère le tableau de chronos dans la fonction récupérer données
     float *a = recupererdonnees1(athlete, epreuve);
@@ -630,7 +628,7 @@ float * statistique1 ( char *athlete,  char *epreuve) {
     for (int i = 1; i < taille; i++) {
         moyenne += a[i];
     }
-    float vraimoyenne = moyenne / 2;
+    float vraimoyenne = moyenne / (taille-1);
 
 //on crée un tableau dans lequel on rentrera le pire et le meilleur temps et la moyenne
     float *tab = malloc(3 * sizeof(float));
@@ -645,6 +643,7 @@ float * statistique1 ( char *athlete,  char *epreuve) {
 
     return tab;
 }
+
 //Procédure affichant le meilleur et le pire temps ainsi que la moyenne de l'athlete pour une epreuve
 void afficheSatistique( char *athlete, char* epreuve) {
 //on récupère le tableau composé de la moyenne, le pire et le meilleur temps, puis on l'affiche
@@ -917,7 +916,9 @@ int main() {
 
                 case 3 /* Voir Statistiques */:
                     //vérifier si l'utilisateur rentre un athlete qui existe
-                    do {
+                    printf("Saisir le nom de l'athlete: ");
+                    scanf("%s", athlete);
+                    /*do {
                         printf("Saisir le nom de l'athlete: ");
                         scanf("%s", athlete);
 
@@ -936,7 +937,7 @@ int main() {
                             printf("Le fichier sur l'athlete n'existe pas.\n");
                             viderBuffer();
                         }
-                    } while (1);
+                    } while (1);*/
                     //on alloue la place pour le nom des épreuves
                     char *epreuve = malloc(10);
                     if (epreuve == NULL) {
