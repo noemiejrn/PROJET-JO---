@@ -103,3 +103,6 @@ mais elle est spécifiquement conçue pour les épreuves de relais. Elle prend e
 le nom de l'athlète, le nom de l'épreuve de relais, ainsi que deux dates, 
 extrait les chronos de l'athlète pour le relais spécifié aux deux
 dates données, puis calcule et affiche la différence de temps entre ces deux chronos.
+
+## ➢ Explication du quatrième cas
+Cette dernière option permet simplement à l'utilisateur de quitter le menue principal.
