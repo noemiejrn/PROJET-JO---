@@ -603,6 +603,7 @@ float * statistique1 ( char *athlete,  char *epreuve) {
 //Procédure affichant le meilleur et le pire temps ainsi que la moyenne de l'athlete pour une epreuve
 void afficheSatistique( char *athlete, char* epreuve) {
 //on récupère le tableau composé de la moyenne, le pire et le meilleur temps, puis on l'affiche
+
     float *tab = statistique(athlete, epreuve);
     printf("le meilleur temps de l'athlete %s au %s est %f  \n", athlete, epreuve, tab[1]);
     printf("le pire temps de l'athlete %s au %s est %f \n ", athlete, epreuve, tab[0]);
@@ -889,6 +890,7 @@ int main() {
                 } while (compteur_verif_nom == 0);
                 //on alloue la place pour le nom des épreuves
                 char *epreuve = malloc(10);
+
                 if (epreuve == NULL) {
                     exit(1);
                 }
@@ -924,8 +926,10 @@ int main() {
                             strcpy(fichier_entree_nom, athlete);
                             //on ajoute .txt a la fin de nom_fichier
                             strcat(fichier_entree_nom, ".txt");
+
                             tri_epreuve_date(fichier_entree_nom, epreuve, fichier_sortie_epreuve);
                             afficheSatistique(athlete, epreuve);
+
                             do {
                                 printf("Entrez la date (JJ/MM/AAAA) que vous voulez observer: \n");
                                 scanf("%2d/%2d/%4d", &date1.jour, &date1.mois, &date1.annee);
