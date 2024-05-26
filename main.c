@@ -274,7 +274,7 @@ int relais_existe(char *nom_fichier, char *date, char *athlete){
 
 
 // fonction pour entrer un resultat pour un athlete
-void Definir_Resultat_Par_Athlete(const char *athlete) {
+void Definir_Resultat_Par_Athlete( char *athlete) {
 
     char nom_fichier[MAX_LONGUEUR_FICHIER];
 
@@ -399,9 +399,9 @@ void Definir_Resultat_Par_Athlete(const char *athlete) {
             }
 
             if (n_epreuve == 5)
-                // on ajoute la ligne athlete date epreuve position resultat;
+                // on ajoute la ligne athlete date epreuve position resultat
                 fprintf(fichier, "%s %d/%d/%d %s %d %f\n", athlete, dates.jour, dates.mois, dates.annee, epreuve,position, resultat);
-                // on ajoute la ligne athlete date epreuve  resultat;
+                // on ajoute la ligne athlete date epreuve resultat
             else fprintf(fichier, "%s %d/%d/%d %s %f\n", athlete, dates.jour, dates.mois, dates.annee, epreuve, resultat);
 
             fclose(fichier);
@@ -423,7 +423,7 @@ float * recupererdonnees(char *athlete, char *epreuve) {
     FILE *fichier = NULL;
 
     char nom_fichier[MAX_LONGUEUR_SAISIE];
-    //le copie le nom de l'athleteb dans le nom du fichier
+    //on copie le nom de l'athlete dans le nom du fichier
     strncpy(nom_fichier, athlete, MAX_LONGUEUR_SAISIE-1);
     //on ajoute _ juste après puis epreuve
    strcat(nom_fichier,"_");
@@ -450,7 +450,7 @@ float * recupererdonnees(char *athlete, char *epreuve) {
                 i++;
             }
         }
-//on créé un tableau qui sera composé des tesmps de l'athlète en allouant l'espace en fonction du nombre de ligne du fichier
+//on crée un tableau qui sera composé des temps de l'athlète en allouant l'espace en fonction du nombre de ligne du fichier
         float *chronos = malloc((i ) * sizeof(float));
         if (chronos == NULL) {
             printf("erreur d'allocation de la mémoire\n");
@@ -506,7 +506,7 @@ float * recupererdonnees1(char *athlete, char *epreuve) {
 
             }
         }
-//on cree un tableau qui sera composé des tesmps de l'athlète en allouant l'espace en fonction du nombre de ligne du fichier
+//on crée un tableau qui sera composé des temps de l'athlète en allouant l'espace en fonction du nombre de ligne du fichier
         float *chronos = malloc((i ) * sizeof(float));
         if (chronos == NULL) {
             printf("erreur d'allocation de la mémoire\n");
@@ -559,7 +559,7 @@ float * statistique ( char *athlete,  char *epreuve) {
     }
     float vraimoyenne = moyenne / 2;
 
-//on créé un tableau dans lequel on rentrera le pire et le meilleur temps et la moyenne
+//on crée un tableau dans lequel on rentrera le pire et le meilleur temps et la moyenne
     float *tab = malloc(3 * sizeof(float));
     //le pire temps
     tab[0]=a[taille-1];
@@ -570,9 +570,9 @@ float * statistique ( char *athlete,  char *epreuve) {
     AthleteMoyenne top_athlete;
     strncpy(top_athlete.nom, athlete,49);
     top_athlete.moyenne=tab[2];
-    //pour pouvoir connaître les athlètes qui iront au Jo, on va créér un pfichier qui aura la moyenne et le nom de l'athlete
+    //pour pouvoir connaître les athlètes qui iront au Jo, on va créér un fichier qui aura la moyenne et le nom de l'athlete
     FILE*fichier;
-    //on ouvre le fichier correspondant en fonction des épreuves, il n'y a pas le relais car on demande de choisir les 3 meilleurs athlètes, ce qui n'a aps de sens pour un relais de 4 personnes
+    //on ouvre le fichier correspondant en fonction des épreuves, il n'y a pas le relais, on demande de choisir les 3 meilleurs athlètes, ce qui n'a aps de sens pour un relais de 4 personnes
     if(strcmp(epreuve, "100m")==0) {
         fichier = fopen("statistiquess100m.txt", "a+");
     }
@@ -587,10 +587,32 @@ float * statistique ( char *athlete,  char *epreuve) {
     }else{
         exit(1);
     }
-//on entre les valeurs dans le fichier (le nom et la moyenne)
-    fprintf(fichier,"%s %f\n",top_athlete.nom ,top_athlete.moyenne);
+    AthleteMoyenne athletes[100];
+    int n = 0;
+    char ligne[200];
+
+    while (fgets(ligne, sizeof(ligne), fichier)) {
+        sscanf(ligne, "%49s %f", athletes[n].nom, &athletes[n].moyenne);
+        n++;
+    }
     fclose(fichier);
 
+    // Vérifier si l'athlète est déjà présent
+    int found = 0;
+    for (int i = 0; i < n; i++) {
+        if (strcmp(athletes[i].nom, top_athlete.nom) == 0) {
+            athletes[i].moyenne = top_athlete.moyenne;
+            found = 1;
+            break;
+        }
+    }
+
+//on entre les valeurs dans le fichier (le nom et la moyenne)
+if(found==0){
+    fprintf(fichier,"%s %f\n",top_athlete.nom ,top_athlete.moyenne);
+}
+
+    fclose(fichier);
     free(a);
 
     return tab;
@@ -610,7 +632,7 @@ float * statistique1 ( char *athlete,  char *epreuve) {
     }
     float vraimoyenne = moyenne / 2;
 
-//on créé un tableau dans lequel on rentrera le pire et le meilleur temps et la moyenne
+//on crée un tableau dans lequel on rentrera le pire et le meilleur temps et la moyenne
     float *tab = malloc(3 * sizeof(float));
     //le pire temps
     tab[0]=a[taille-1];
@@ -629,7 +651,7 @@ void afficheSatistique( char *athlete, char* epreuve) {
     float *tab = statistique(athlete, epreuve);
     printf("le meilleur temps de l'athlete %s au %s est %f  \n", athlete, epreuve, tab[1]);
     printf("le pire temps de l'athlete %s au %s est %f \n ", athlete, epreuve, tab[0]);
-    printf("la moyenne de l'athlète %s pour l'épreuve %s est %f\n", athlete, epreuve, tab[2]);
+    printf("la moyenne de l'athlete %s pour l'epreuve %s est %f\n", athlete, epreuve, tab[2]);
     free(tab);
 }
 
@@ -639,7 +661,7 @@ void afficheSatistique1( char *athlete, char* epreuve) {
     float *tab = statistique1(athlete, epreuve);
     printf("le meilleur temps de l'athlete %s au %s est %f  \n", athlete, epreuve, tab[1]);
     printf("le pire temps de l'athlete %s au %s est %f \n ", athlete, epreuve, tab[0]);
-    printf("la moyenne de l'athlète %s pour l'épreuve %s est %f\n", athlete, epreuve, tab[2]);
+    printf("la moyenne de l'athlete %s pour l'epreuve %s est %f\n", athlete, epreuve, tab[2]);
     free(tab);
 }
 
@@ -671,24 +693,23 @@ void Meilleurs_Athletes(char *epreuve){
     for (int i=0; i<3; i++){
         fscanf(fichier, "%s %f\n",athlete.nom, &athlete.moyenne);
         if (i==0){
-            printf("l'athlete %s est le premier avec la meilleure moyenne de temps, %f, dans l'épreuve %s\n",athlete.nom, athlete.moyenne, epreuve);
+            printf("l'athlete %s est le premier avec la meilleure moyenne de temps, %f, dans l'epreuve %s\n",athlete.nom, athlete.moyenne, epreuve);
         }
         if (i==1){
-            printf("l'athlete %s est le deuxième avec la  moyenne de temps, %f, dans l'épreuve %s\n",athlete.nom, athlete.moyenne, epreuve);
+            printf("l'athlete %s est le deuxieme avec la  moyenne de temps, %f, dans l'epreuve %s\n",athlete.nom, athlete.moyenne, epreuve);
         }
         if (i==2){
-            printf("l'athlete %s est le troisième avec la  moyenne de temps, %f, dans l'épreuve %s\n",athlete.nom, athlete.moyenne, epreuve);
+            printf("l'athlete %s est le troisieme avec la  moyenne de temps, %f, dans l'epreuve %s\n",athlete.nom, athlete.moyenne, epreuve);
         }
     }
     fclose(fichier);
 }
 
-//Procédure pour calculer la différences de temps pour une epreuve entre 2 dates
+//Procédure pour calculer la différence de temps pour une epreuve entre 2 dates
 void differenceTempsDates(char *athlete, char *epreuve, Date a, Date  b){
-    printf("test1");
     FILE *fichier = NULL;
     char nom_fichier[MAX_LONGUEUR_SAISIE];
-    //le copie le nom de l'athleteb dans le nom du fichier
+    //on copie le nom de l'athlete dans le nom du fichier
     strncpy(nom_fichier, athlete, MAX_LONGUEUR_SAISIE-1);
     //on ajoute _ juste après puis epreuve
    strcat(nom_fichier,"_");
@@ -729,7 +750,7 @@ void differenceTempsDates(char *athlete, char *epreuve, Date a, Date  b){
         }
         fclose(fichier);
         if (chrono[0] == 0 || chrono[1] == 0) {
-            printf("l'une  des dates que vous avez rentrée n'existe pas\n");
+            printf("l'une  des dates que vous avez rentre n'existe pas\n");
 //on calcule la différence de temps entre les chronos
         } else {
             float difference = chrono[0] - chrono[1];
@@ -744,12 +765,11 @@ void differenceTempsDates(char *athlete, char *epreuve, Date a, Date  b){
     fclose(fichier);
 }
 
-//Procédure pour calculer la différences de temps pour une epreuve entre 2 dates pour le relais
+//Procédure pour calculer la différence de temps pour une epreuve entre 2 dates pour le relais
 void differenceTempsDates1(char *athlete, char *epreuve, Date a, Date  b){
-    printf("test1");
     FILE *fichier = NULL;
     char nom_fichier[MAX_LONGUEUR_SAISIE];
-    //le copie le nom de l'athleteb dans le nom du fichier
+    //on copie le nom de l'athlete dans le nom du fichier
     strncpy(nom_fichier, athlete, MAX_LONGUEUR_SAISIE-1);
     //on ajoute _ juste après puis epreuve
     strcat(nom_fichier,"_");
@@ -777,12 +797,12 @@ void differenceTempsDates1(char *athlete, char *epreuve, Date a, Date  b){
                        fiches[i].epreuve,
                        &fiches[i].position,
                        &fiches[i].temps) == 6) {
-                //on compare la date entrée par l'utlisateur et celle sur la ligne, si c'est elle, on entre dans dans le tableau le chrono
+                //on compare la date entrée par l'utlisateur et celle sur la ligne, si c'est elle, on entre dans le tableau le chrono
                 if (fiches[i].date.jour == a.jour && fiches[i].date.mois == a.mois && fiches[i].date.annee == a.annee) {
                     chrono[0] = fiches[i].temps;
                     i++;
                 }
-                //on compare la date entrée par l'utlisateur et celle sur la ligne, si c'est elle, on entre dans dans le tableau le chrono
+                //on compare la date entrée par l'utlisateur et celle sur la ligne, si c'est elle, on entre dans le tableau le chrono
                 if (fiches[i].date.jour == b.jour && fiches[i].date.mois == b.mois && fiches[i].date.annee == b.annee) {
                     chrono[1] = fiches[i].temps;
                     i++;
@@ -791,7 +811,7 @@ void differenceTempsDates1(char *athlete, char *epreuve, Date a, Date  b){
         }
         fclose(fichier);
         if (chrono[0] == 0 || chrono[1] == 0) {
-            printf("l'une  des dates que vous avez rentrée n'existe pas\n");
+            printf("l'une  des dates que vous avez rentre n'existe pas\n");
 //on calcule la différence de temps entre les chronos
         } else {
             float difference = chrono[0] - chrono[1];
@@ -897,21 +917,27 @@ int main() {
                     break;
 
                 case 3 /* Voir Statistiques */:
+                    //vérifier si l'utilisateur rentre un athlete qui existe
                     do {
-                        printf("saisir nom de l'athele:");
+                        printf("Saisir le nom de l'athlete: ");
                         scanf("%s", athlete);
-                        char *athlete_verif = athlete;
-                        strcat(athlete_verif, ".txt");
-                        FILE *fichier5;
-                        compteur_verif_nom=1;
-                        if (fopen(athlete_verif, "r") == NULL) {
-                           printf("Le fichier sur l'athlete n'existe pas \n");
+
+                        // On regroupe .txt avec athlete pour appeler le fichier de l'athlete
+                        char athlete_verif[MAX_LONGUEUR_SAISIE + 4]; // +4 pour ".txt" et le caractère nul
+                        snprintf(athlete_verif, MAX_LONGUEUR_SAISIE + 4, "%s.txt", athlete);
+
+                        // Ouverture du fichier correspondant
+                        FILE *fichier5 = fopen(athlete_verif, "r");
+
+                        // Vérification si le fichier existe
+                        if (fichier5 != NULL) {
+                            fclose(fichier5); // Fermeture du fichier si ouvert avec succès
+                            break; // Sortie de la boucle si le fichier existe
+                        } else {
+                            printf("Le fichier sur l'athlete n'existe pas.\n");
                             viderBuffer();
-                            fclose(fichier5);
-                            compteur_verif_nom=0;
                         }
-                        fclose(fichier5);
-                   }while (compteur_verif_nom==0);
+                    } while (1);
                     //on alloue la place pour le nom des épreuves
                     char *epreuve = malloc(10);
                     if (epreuve == NULL) {
@@ -931,11 +957,11 @@ int main() {
 
                         switch (n_epreuve) {
                             case 1 /* 100m */:
-                                //on nomme la chaîne de caractère épreuve en fonction du choix de l'épreuve
+                                //on nomme la chaîne de caractère epreuve en fonction du choix de l'épreuve
                                 strcpy(epreuve, "100m");
-                                printf("vous avez choisi l'épreuve %s\n", epreuve);
+                                printf("vous avez choisi l'epreuve %s\n", epreuve);
 
-                                printf("Les statistiques de l'athlète %s pour l'épreuve %s:\n", athlete, epreuve);
+                                printf("Les statistiques de l'athlete %s pour l'epreuve %s:\n", athlete, epreuve);
                                 char *fichier_sortie_epreuve = malloc(50);
                                 //on renomme la chaîne de caractère en athlète
 
@@ -951,56 +977,69 @@ int main() {
                                 strcat(fichier_entree_nom, ".txt");
                                 tri_epreuve_date(fichier_entree_nom, epreuve, fichier_sortie_epreuve);
                                 afficheSatistique(athlete, epreuve);
+                                char reponse;
                                 do {
-                                    printf("Entrez la date (JJ/MM/AAAA) que vous voulez observer: \n");
-                                    scanf("%2d/%2d/%4d", &date1.jour, &date1.mois, &date1.annee);
-                                    //on vérifie si la date est correctement rentrée
-                                    if (valideDate(date1.jour, date1.mois, date1.annee) != 0) {
-                                        // on formate la date comme JJ/MM/AAAA
-                                        do {
-                                            printf("Entrez la deuxième date (JJ/MM/AAAA) à laquelle vous voulez observer la différence de temps avec la première: \n");
-                                            scanf("%2d/%2d/%4d", &date2.jour, &date2.mois, &date2.annee);
+                                    do {
+                                        printf("Entrez la date (JJ/MM/AAAA) que vous voulez observer: \n");
+                                        scanf("%2d/%2d/%4d", &date1.jour, &date1.mois, &date1.annee);
+                                        //on vérifie si la date est correctement rentrée
+                                        if (valideDate(date1.jour, date1.mois, date1.annee) != 0) {
+                                            // on formate la date comme JJ/MM/AAAA
+                                            do {
+                                                printf("Entrez la deuxieme date (JJ/MM/AAAA) a laquelle vous voulez observer la difference de temps avec la premiere: \n");
+                                                scanf("%2d/%2d/%4d", &date2.jour, &date2.mois, &date2.annee);
 
-                                            if (valideDate(date2.jour, date2.mois, date2.annee) != 0) {
-                                                // on formate la date comme JJ/MM/AAAA
-                                                differenceTempsDates(athlete, epreuve, date1, date2);
-                                            } else {
-                                                printf("Erreur! Entrer une nouvelle date \n");
-                                                viderBuffer();
-                                            }
-                                        } while (valideDate(date2.jour, date2.mois, date2.annee) == 0);
-                                    } else {
-                                        printf("Erreur! Entrer une nouvelle date \n");
-                                        viderBuffer();
-                                    }
-                                } while (valideDate(date2.jour, date2.mois, date2.annee) == 0);
+                                                if (valideDate(date2.jour, date2.mois, date2.annee) != 0) {
+                                                    // on formate la date comme JJ/MM/AAAA
+                                                    differenceTempsDates(athlete, epreuve, date1, date2);
+                                                } else {
+                                                    printf("Erreur! Entrer une nouvelle date \n");
+                                                    viderBuffer();
+                                                }
+                                            } while (valideDate(date2.jour, date2.mois, date2.annee) == 0);
+                                        } else {
+                                            printf("Erreur! Entrer une nouvelle date \n");
+                                            viderBuffer();
+                                        }
+                                    } while (valideDate(date2.jour, date2.mois, date2.annee) == 0);
+                                    printf("Voulez-vous verifier la difference de temps pour d'autres dates ? (O/N): ");
+
+                                    scanf(" %c", &reponse);
+                                } while (reponse == 'O' || reponse == 'o');
 
                                 //on va vérifier si dans le fichier qui comporte les moyennes de tous athletes pour cette epreuve, comprend au moins 3 athlètes
-                                char *n;
-                                float f;
-                                int i;
+
+                                int i=0;
                                 FILE *fichier = fopen("statistiquess100m.txt", "r");
-                                while (fscanf(fichier, "%s %f", n, &f)) {
-                                    i++;
-                                }
-                                fclose(fichier);
                                 rewind(fichier);
+                                AthleteMoyenne fiches[100];
+                                char lignes[200];
+                                // Lire les données depuis le fichier d'entrée
+                                while (fgets(lignes, 199, fichier)) {
+                                    if (sscanf(lignes, "%49s %f",
+                                               fiches[i].nom,
+                                               &fiches[i].moyenne) == 2 ) {
+
+                                        i++;
+                                    }
+                                }
+
+                                rewind(fichier);
+                                fclose(fichier);
                                 if (i >= 3) {
-                                    printf(" Connaître les 3 meilleurs athlètes à l'épreuve %s: \n", epreuve);
+                                    printf(" Connaitre les 3 meilleurs athletes a l'epreuve %s: \n", epreuve);
                                     Meilleurs_Athletes(epreuve);
                                 } else {
-                                    printf("il n'y pas assez d'ayhlète pour savoir qui emmener aux JO");
+                                    printf("il n'y pas assez d'athlete pour savoir qui emmener aux JO");
                                 }
-
-
                                 break;
 
                             case 2 /* 400m */:
                                 //on nomme la chaîne de caractère épreuve en fonction du choix de l'épreuve
                                 strcpy(epreuve, "400m");
-                                printf("vous avez choisi l'épreuve %s\n", epreuve);
+                                printf("vous avez choisi l'epreuve %s\n", epreuve);
 
-                                printf("Les statistiques de l'athlète %s pour l'épreuve %s:\n", athlete, epreuve);
+                                printf("Les statistiques de l'athlete %s pour l'epreuve %s:\n", athlete, epreuve);
                                 char *fichier_sortie_epreuve1 = malloc(50);
                                 //on renomme la chaîne de caractère en athlète
 
@@ -1017,53 +1056,66 @@ int main() {
                                 tri_epreuve_date(fichier_entree_nom1, epreuve, fichier_sortie_epreuve1);
                                 afficheSatistique(athlete, epreuve);
                                 do {
-                                    printf("Entrez la date (JJ/MM/AAAA) que vous voulez observer: \n");
-                                    scanf("%2d/%2d/%4d", &date1.jour, &date1.mois, &date1.annee);
-                                    //on vérifie si la date est correctement rentrée
-                                    if (valideDate(date1.jour, date1.mois, date1.annee) != 0) {
-                                        // on formate la date comme JJ/MM/AAAA
-                                        do {
-                                            printf("Entrez la deuxième date (JJ/MM/AAAA) à laquelle vous voulez observer la différence de temps avec la première: \n");
-                                            scanf("%2d/%2d/%4d", &date2.jour, &date2.mois, &date2.annee);
+                                    do {
+                                        printf("Entrez la date (JJ/MM/AAAA) que vous voulez observer: \n");
+                                        scanf("%2d/%2d/%4d", &date1.jour, &date1.mois, &date1.annee);
+                                        //on vérifie si la date est correctement rentrée
+                                        if (valideDate(date1.jour, date1.mois, date1.annee) != 0) {
+                                            // on formate la date comme JJ/MM/AAAA
+                                            do {
+                                                printf("Entrez la deuxieme date (JJ/MM/AAAA) a laquelle vous voulez observer la difference de temps avec la premiere: \n");
+                                                scanf("%2d/%2d/%4d", &date2.jour, &date2.mois, &date2.annee);
 
-                                            if (valideDate(date2.jour, date2.mois, date2.annee) != 0) {
-                                                // on formate la date comme JJ/MM/AAAA
-                                                differenceTempsDates(athlete, epreuve, date1, date2);
-                                            } else {
-                                                printf("Erreur! Entrer une nouvelle date \n");
-                                                viderBuffer();
-                                            }
-                                        } while (valideDate(date2.jour, date2.mois, date2.annee) == 0);
-                                    } else {
-                                        printf("Erreur! Entrer une nouvelle date \n");
-                                        viderBuffer();
-                                    }
-                                } while (valideDate(date2.jour, date2.mois, date2.annee) == 0);
+                                                if (valideDate(date2.jour, date2.mois, date2.annee) != 0) {
+                                                    // on formate la date comme JJ/MM/AAAA
+                                                    differenceTempsDates(athlete, epreuve, date1, date2);
+                                                } else {
+                                                    printf("Erreur! Entrer une nouvelle date \n");
+                                                    viderBuffer();
+                                                }
+                                            } while (valideDate(date2.jour, date2.mois, date2.annee) == 0);
+                                        } else {
+                                            printf("Erreur! Entrer une nouvelle date \n");
+                                            viderBuffer();
+                                        }
+                                    } while (valideDate(date2.jour, date2.mois, date2.annee) == 0);
+                                    printf("Voulez-vous verifier la difference de temps pour d'autres dates ? (O/N): ");
+
+                                    scanf(" %c", &reponse);
+                                } while (reponse == 'O' || reponse == 'o');
 
                                 //on va vérifier si dans le fichier qui comporte les moyennes de tous athletes pour cette epreuve, comprend au moins 3 athlètes
-                                char *n1;
-                                float f1;
-                                int i1;
-                                FILE *fichier1 = fopen("statistiquess400m.txt", "r");
-                                while (fscanf(fichier, "%s %f", n1, &f1)) {
-                                    i1++;
-                                }
-                                fclose(fichier1);
+                                int i1=0;
+                                FILE *fichier1 = fopen("statistiquess100m.txt", "r");
                                 rewind(fichier1);
-                                if (i >= 3) {
-                                    printf(" Connaître les 3 meilleurs athlètes à l'épreuve %s: \n", epreuve);
+                                AthleteMoyenne fiches1[100];
+                                char lignes1[200];
+                                // Lire les données depuis le fichier d'entrée
+                                while (fgets(lignes1, 199, fichier1)) {
+                                    if (sscanf(lignes1, "%49s %f",
+                                               fiches1[i].nom,
+                                               &fiches1[i].moyenne) == 2 ) {
+
+                                        i1++;
+                                    }
+                                }
+
+                                rewind(fichier1);
+                                fclose(fichier1);
+                                if (i1 >= 3) {
+                                    printf(" Connaitre les 3 meilleurs athletes a l'epreuve %s: \n", epreuve);
                                     Meilleurs_Athletes(epreuve);
                                 } else {
-                                    printf("il n'y pas assez d'ayhlète pour savoir qui emmener aux JO");
+                                    printf("il n'y pas assez d'athlete pour savoir qui emmener aux JO");
                                 }
                                 break;
 
                             case 3 /* 5000m */:
                                 //on nomme la chaîne de caractère épreuve en fonction du choix de l'épreuve
                                 strcpy(epreuve, "5000m");
-                                printf("vous avez choisi l'épreuve %s\n", epreuve);
+                                printf("vous avez choisi l'epreuve %s\n", epreuve);
 
-                                printf("Les statistiques de l'athlète %s pour l'épreuve %s:\n", athlete, epreuve);
+                                printf("Les statistiques de l'athlete %s pour l'epreuve %s:\n", athlete, epreuve);
                                 char *fichier_sortie_epreuve2 = malloc(50);
                                 //on renomme la chaîne de caractère en athlète
 
@@ -1080,53 +1132,66 @@ int main() {
                                 tri_epreuve_date(fichier_entree_nom2, epreuve, fichier_sortie_epreuve2);
                                 afficheSatistique(athlete, epreuve);
                                 do {
-                                    printf("Entrez la date (JJ/MM/AAAA) que vous voulez observer: \n");
-                                    scanf("%2d/%2d/%4d", &date1.jour, &date1.mois, &date1.annee);
-                                    //on vérifie si la date est correctement rentrée
-                                    if (valideDate(date1.jour, date1.mois, date1.annee) != 0) {
-                                        // on formate la date comme JJ/MM/AAAA
-                                        do {
-                                            printf("Entrez la deuxième date (JJ/MM/AAAA) à laquelle vous voulez observer la différence de temps avec la première: \n");
-                                            scanf("%2d/%2d/%4d", &date2.jour, &date2.mois, &date2.annee);
+                                    do {
+                                        printf("Entrez la date (JJ/MM/AAAA) que vous voulez observer: \n");
+                                        scanf("%2d/%2d/%4d", &date1.jour, &date1.mois, &date1.annee);
+                                        //on vérifie si la date est correctement rentrée
+                                        if (valideDate(date1.jour, date1.mois, date1.annee) != 0) {
+                                            // on formate la date comme JJ/MM/AAAA
+                                            do {
+                                                printf("Entrez la deuxieme date (JJ/MM/AAAA) a laquelle vous voulez observer la difference de temps avec la premiere: \n");
+                                                scanf("%2d/%2d/%4d", &date2.jour, &date2.mois, &date2.annee);
 
-                                            if (valideDate(date2.jour, date2.mois, date2.annee) != 0) {
-                                                // on formate la date comme JJ/MM/AAAA
-                                                differenceTempsDates(athlete, epreuve, date1, date2);
-                                            } else {
-                                                printf("Erreur! Entrer une nouvelle date \n");
-                                                viderBuffer();
-                                            }
-                                        } while (valideDate(date2.jour, date2.mois, date2.annee) == 0);
-                                    } else {
-                                        printf("Erreur! Entrer une nouvelle date \n");
-                                        viderBuffer();
-                                    }
-                                } while (valideDate(date2.jour, date2.mois, date2.annee) == 0);
+                                                if (valideDate(date2.jour, date2.mois, date2.annee) != 0) {
+                                                    // on formate la date comme JJ/MM/AAAA
+                                                    differenceTempsDates(athlete, epreuve, date1, date2);
+                                                } else {
+                                                    printf("Erreur! Entrer une nouvelle date \n");
+                                                    viderBuffer();
+                                                }
+                                            } while (valideDate(date2.jour, date2.mois, date2.annee) == 0);
+                                        } else {
+                                            printf("Erreur! Entrer une nouvelle date \n");
+                                            viderBuffer();
+                                        }
+                                    } while (valideDate(date2.jour, date2.mois, date2.annee) == 0);
+                                    printf("Voulez-vous verifier la difference de temps pour d'autres dates ? (O/N): ");
+
+                                    scanf(" %c", &reponse);
+                                } while (reponse == 'O' || reponse == 'o');
 
                                 //on va vérifier si dans le fichier qui comporte les moyennes de tous athletes pour cette epreuve, comprend au moins 3 athlètes
-                                char *n2;
-                                float f2;
-                                int i2;
-                                FILE *fichier2 = fopen("statistiquess5000m.txt", "r");
-                                while (fscanf(fichier, "%s %f", n2, &f2)) {
-                                    i2++;
-                                }
-                                fclose(fichier2);
+                                int i2=0;
+                                FILE *fichier2 = fopen("statistiquess100m.txt", "r");
                                 rewind(fichier2);
-                                if (i >= 3) {
-                                    printf(" Connaître les 3 meilleurs athlètes à l'épreuve %s: \n", epreuve);
+                                AthleteMoyenne fiches2[100];
+                                char lignes2[200];
+                                // Lire les données depuis le fichier d'entrée
+                                while (fgets(lignes2, 199, fichier2)) {
+                                    if (sscanf(lignes2, "%49s %f",
+                                               fiches2[i].nom,
+                                               &fiches2[i].moyenne) == 2 ) {
+
+                                        i++;
+                                    }
+                                }
+
+                                rewind(fichier2);
+                                fclose(fichier2);
+                                if (i2 >= 3) {
+                                    printf(" Connaitre les 3 meilleurs athletes a l'epreuve %s: \n", epreuve);
                                     Meilleurs_Athletes(epreuve);
                                 } else {
-                                    printf("il n'y pas assez d'ayhlète pour savoir qui emmener aux JO");
+                                    printf("il n'y pas assez d'athlete pour savoir qui emmener aux JO");
                                 }
                                 break;
 
                             case 4 /* marathon */:
                                 //on nomme la chaîne de caractère épreuve en fonction du choix de l'épreuve
                                 strcpy(epreuve, "marathon");
-                                printf("vous avez choisi l'épreuve %s\n", epreuve);
+                                printf("vous avez choisi l'epreuve %s\n", epreuve);
 
-                                printf("Les statistiques de l'athlète %s pour l'épreuve %s:\n", athlete, epreuve);
+                                printf("Les statistiques de l'athlete %s pour l'epreuve %s:\n", athlete, epreuve);
                                 char *fichier_sortie_epreuve3 = malloc(50);
                                 //on renomme la chaîne de caractère en athlète
 
@@ -1143,52 +1208,65 @@ int main() {
                                 tri_epreuve_date(fichier_entree_nom3, epreuve, fichier_sortie_epreuve3);
                                 afficheSatistique(athlete, epreuve);
                                 do {
-                                    printf("Entrez la date (JJ/MM/AAAA) que vous voulez observer: \n");
-                                    scanf("%2d/%2d/%4d", &date1.jour, &date1.mois, &date1.annee);
-                                    //on vérifie si la date est correctement rentrée
-                                    if (valideDate(date1.jour, date1.mois, date1.annee) != 0) {
-                                        // on formate la date comme JJ/MM/AAAA
-                                        do {
-                                            printf("Entrez la deuxième date (JJ/MM/AAAA) à laquelle vous voulez observer la différence de temps avec la première: \n");
-                                            scanf("%2d/%2d/%4d", &date2.jour, &date2.mois, &date2.annee);
+                                    do {
+                                        printf("Entrez la date (JJ/MM/AAAA) que vous voulez observer: \n");
+                                        scanf("%2d/%2d/%4d", &date1.jour, &date1.mois, &date1.annee);
+                                        //on vérifie si la date est correctement rentrée
+                                        if (valideDate(date1.jour, date1.mois, date1.annee) != 0) {
+                                            // on formate la date comme JJ/MM/AAAA
+                                            do {
+                                                printf("Entrez la deuxieme date (JJ/MM/AAAA) a laquelle vous voulez observer la difference de temps avec la premiere: \n");
+                                                scanf("%2d/%2d/%4d", &date2.jour, &date2.mois, &date2.annee);
 
-                                            if (valideDate(date2.jour, date2.mois, date2.annee) != 0) {
-                                                // on formate la date comme JJ/MM/AAAA
-                                                differenceTempsDates(athlete, epreuve, date1, date2);
-                                            } else {
-                                                printf("Erreur! Entrer une nouvelle date \n");
-                                                viderBuffer();
-                                            }
-                                        } while (valideDate(date2.jour, date2.mois, date2.annee) == 0);
-                                    } else {
-                                        printf("Erreur! Entrer une nouvelle date \n");
-                                        viderBuffer();
-                                    }
-                                } while (valideDate(date2.jour, date2.mois, date2.annee) == 0);
+                                                if (valideDate(date2.jour, date2.mois, date2.annee) != 0) {
+                                                    // on formate la date comme JJ/MM/AAAA
+                                                    differenceTempsDates(athlete, epreuve, date1, date2);
+                                                } else {
+                                                    printf("Erreur! Entrer une nouvelle date \n");
+                                                    viderBuffer();
+                                                }
+                                            } while (valideDate(date2.jour, date2.mois, date2.annee) == 0);
+                                        } else {
+                                            printf("Erreur! Entrer une nouvelle date \n");
+                                            viderBuffer();
+                                        }
+                                    } while (valideDate(date2.jour, date2.mois, date2.annee) == 0);
+                                    printf("Voulez-vous verifier la difference de temps pour d'autres dates ? (O/N): ");
+
+                                    scanf(" %c", &reponse);
+                                } while (reponse == 'O' || reponse == 'o');
                                 //on va vérifier si dans le fichier qui comporte les moyennes de tous athletes pour cette epreuve, comprend au moins 3 athlètes
-                                char *n3;
-                                float f3;
-                                int i3;
-                                FILE *fichier3 = fopen("statistiquessmarathon.txt", "r");
-                                while (fscanf(fichier, "%s %f", n3, &f3)) {
-                                    i3++;
-                                }
-                                fclose(fichier3);
+                                int i3=0;
+                                FILE *fichier3 = fopen("statistiquess100m.txt", "r");
                                 rewind(fichier3);
-                                if (i >= 3) {
-                                    printf(" Connaître les 3 meilleurs athlètes à l'épreuve %s: \n", epreuve);
+                                AthleteMoyenne fiches3[100];
+                                char lignes3[200];
+                                // Lire les données depuis le fichier d'entrée
+                                while (fgets(lignes3, 199, fichier3)) {
+                                    if (sscanf(lignes3, "%49s %f",
+                                               fiches3[i].nom,
+                                               &fiches3[i].moyenne) == 2 ) {
+
+                                        i++;
+                                    }
+                                }
+
+                                rewind(fichier3);
+                                fclose(fichier3);
+                                if (i3 >= 3) {
+                                    printf(" Connaitre les 3 meilleurs athletes a l'epreuve %s: \n", epreuve);
                                     Meilleurs_Athletes(epreuve);
                                 } else {
-                                    printf("il n'y pas assez d'ayhlète pour savoir qui emmener aux JO");
+                                    printf("il n'y pas assez d'athlete pour savoir qui emmener aux JO");
                                 }
                                 break;
 
                             case 5 /* relais */:
                                 //on nomme la chaîne de caractère épreuve en fonction du choix de l'épreuve
                                 strcpy(epreuve, "relais");
-                                printf("vous avez choisi l'épreuve %s", epreuve);
+                                printf("vous avez choisi l'epreuve %s", epreuve);
 
-                                printf("Les statistiques de l'athlète %s pour l'épreuve %s:\n", athlete, epreuve);
+                                printf("Les statistiques de l'athlete %s pour l'epreuve %s:\n", athlete, epreuve);
                                 char *fichier_sortie_epreuve4 = malloc(50);
                                 //on renomme la chaîne de caractère en athlète
 
@@ -1206,33 +1284,38 @@ int main() {
                                 afficheSatistique1(athlete, epreuve);
 
                                 do {
-                                    printf("Entrez la date (JJ/MM/AAAA) que vous voulez observer: \n");
-                                    scanf("%2d/%2d/%4d", &date1.jour, &date1.mois, &date1.annee);
-                                    //on vérifie si la date est correctement rentrée
-                                    if (valideDate(date1.jour, date1.mois, date1.annee) != 0) {
-                                        // on formate la date comme JJ/MM/AAAA
-                                        do {
-                                            printf("Entrez la deuxième date (JJ/MM/AAAA) à laquelle vous voulez observer la différence de temps avec la première: \n");
-                                            scanf("%2d/%2d/%4d", &date2.jour, &date2.mois, &date2.annee);
+                                    do {
+                                        printf("Entrez la date (JJ/MM/AAAA) que vous voulez observer: \n");
+                                        scanf("%2d/%2d/%4d", &date1.jour, &date1.mois, &date1.annee);
+                                        //on vérifie si la date est correctement rentrée
+                                        if (valideDate(date1.jour, date1.mois, date1.annee) != 0) {
+                                            // on formate la date comme JJ/MM/AAAA
+                                            do {
+                                                printf("Entrez la deuxieme date (JJ/MM/AAAA) a laquelle vous voulez observer la difference de temps avec la premiere: \n");
+                                                scanf("%2d/%2d/%4d", &date2.jour, &date2.mois, &date2.annee);
 
-                                            if (valideDate(date2.jour, date2.mois, date2.annee) != 0) {
-                                                // on formate la date comme JJ/MM/AAAA
-                                                differenceTempsDates1(athlete, epreuve, date1, date2);
-                                            } else {
-                                                printf("Erreur! Entrer une nouvelle date \n");
-                                                viderBuffer();
-                                            }
-                                        } while (valideDate(date2.jour, date2.mois, date2.annee) == 0);
-                                    } else {
-                                        printf("Erreur! Entrer une nouvelle date \n");
-                                        viderBuffer();
-                                    }
-                                } while (valideDate(date2.jour, date2.mois, date2.annee) == 0);
+                                                if (valideDate(date2.jour, date2.mois, date2.annee) != 0) {
+                                                    // on formate la date comme JJ/MM/AAAA
+                                                    differenceTempsDates(athlete, epreuve, date1, date2);
+                                                } else {
+                                                    printf("Erreur! Entrer une nouvelle date \n");
+                                                    viderBuffer();
+                                                }
+                                            } while (valideDate(date2.jour, date2.mois, date2.annee) == 0);
+                                        } else {
+                                            printf("Erreur! Entrer une nouvelle date \n");
+                                            viderBuffer();
+                                        }
+                                    } while (valideDate(date2.jour, date2.mois, date2.annee) == 0);
+                                    printf("Voulez-vous verifier la difference de temps pour d'autres dates ? (O/N): ");
+
+                                    scanf(" %c", &reponse);
+                                } while (reponse == 'O' || reponse == 'o');
                                 break;
 
                             default:
                                 printf("ce choix n'est pas possible \n");
-                                printf("veuillez choisir le bon numéro pour l'épreuve\n");
+                                printf("veuillez choisir le bon numero pour l'epreuve\n");
                                 viderBuffer();
                                 break;
                         }
