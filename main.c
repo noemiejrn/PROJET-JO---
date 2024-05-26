@@ -847,7 +847,6 @@ int main() {
 
         int choix = -1;
         char athlete[MAX_LONGUEUR_SAISIE];
-        int compteur_verif_nom=1;
 
         do {
             // on affiche le menu principal
