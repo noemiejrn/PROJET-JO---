@@ -527,7 +527,7 @@ float * recupererdonnees(char *athlete, char *epreuve) {
 float * recupererdonnees1(char *athlete, char *epreuve) {
     FILE *fichier = NULL;
     char nom_fichier[MAX_LONGUEUR_SAISIE];
-    //le copie le nom de l'athleteb dans le nom du fichier
+    //On copie le nom de l'athlete dans le nom du fichier
     strncpy(nom_fichier, athlete, MAX_LONGUEUR_SAISIE-1);
     //on ajoute _ juste après puis le nom de l'epreuve
     strcat(nom_fichier,"_");
