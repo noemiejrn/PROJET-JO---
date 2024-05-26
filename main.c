@@ -874,41 +874,41 @@ int main() {
                     char epr[100], a[100];
 
                     // Demande à l'utilsateur de saisir le nom de l'athlete
-                    printf("\nSaisir le nom de l'athlète comme ceci : 'nom.txt':\n");
+                    printf("\nSaisir le nom de l'athlete comme ceci : 'nom.txt':\n");
                     scanf("%s", athlete);
                     while (fopen(athlete, "r") == NULL) {
-                        printf("Le fichier n'existe pas, ou alors vous avez oublié le '.txt'\n");
-                        printf("Saisir le nom de l'athlète comme ceci : 'nom.txt':\n");
+                        printf("Le fichier n'existe pas, ou alors vous avez oublie le '.txt'\n");
+                        printf("Saisir le nom de l'athlete comme ceci : 'nom.txt':\n");
                         scanf("%s", athlete);
                     }
                     // Trie les entrainements d'un athlete par date grâce à la fonction tri_date
                     tri_date(athlete);
-                    printf("La fiche de %s a été triée par date dans le fichier nommé 'fichier_tri_date'", athlete);
+                    printf("La fiche de %s a été triee par date dans le fichier nomme 'fichier_tri_date'", athlete);
 
                     // Demande à l'utilsateur s'il veut voir l'historique pour une épreuve de l'athlete
-                    printf("\n\nVoulez vous consulter l'historique de une épreuve de l'athlète %s ? (! répondre par oui ou non)",
+                    printf("\n\nVoulez vous consulter l'historique de une epreuve de l'athlete %s ? (! répondre par oui ou non)",
                            athlete);
                     scanf("%s", a);
 
                     // Verification de la bonne écriture de l'utilisateur
                     while (strcmp(a, "oui") != 0 && strcmp(a, "non") != 0) {
-                        printf("Répondre par oui ou par non !!!");
+                        printf("Repondre par oui ou par non !!!");
                         scanf("%s", a);
                     }
                     if (strcmp(a, "oui") == 0) {
-                        printf("\nDire le nom de l'épreuve dont vous voulez connaitre l'historique (100m,400m,5000m,marathon,relais)\n");
+                        printf("\nDire le nom de l'epreuve dont vous voulez connaitre l'historique (100m,400m,5000m,marathon,relais)\n");
                         scanf("%s", epr);
                         while (strcmp(epr, "400m") != 0 &&
                                strcmp(epr, "100m") != 0 &&
                                strcmp(epr, "marathon") != 0 &&
                                strcmp(epr, "relais") != 0 &&
                                strcmp(epr, "5000m") != 0) {
-                            printf("Vous n'avez pas saisit une épreuve qui existe !!!");
+                            printf("Vous n'avez pas saisit une epreuve qui existe !!!");
                             printf("\nDire le nom de l'épreuve dont vous voulez connaitre l'historique (100m,400m,5000m,marathon,relais)\n");
                             scanf("%s", epr);
                         }
                         tri_epreuve_date(athlete, epr, fichier_sortie_epreuve);
-                        printf("La fiche de %s a été triée avec l'épreuve '%s' dans le fichier nommé 'fichier_tri_epreuve'\n\n",
+                        printf("La fiche de %s a été triee avec l'epreuve '%s' dans le fichier nomme 'fichier_tri_epreuve'\n\n",
                                athlete, epr);
                     } else if (strcmp(a, "non") == 0) {
                         printf("D'accord\n\n");
