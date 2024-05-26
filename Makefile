@@ -13,8 +13,8 @@ all: $(EXEC)
 
 # Compilation
 $(EXEC): $(SRC)
-    $(CC) $(CFLAGS) $(SRC) -o $(EXEC)
+	$(CC) $(CFLAGS) $(SRC) -o $(EXEC)
 
 # Clean
 clean:
-    rm -f $(EXEC)
+	rm -f $(EXEC)
