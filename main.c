@@ -138,6 +138,58 @@ void tri_epreuve_date(const char *fichier_entree_nom, const char *epreuve_cible,
     }
     fclose(fichier_sortie);
 }
+
+void tri_epreuve_date1(const char *fichier_entree_nom, const char *epreuve_cible, const char *fichier_sortie_nom){
+
+    // Ouverture du fichier d'entrée
+    FILE *fichier_entree = fopen(fichier_entree_nom, "r");
+    if (fichier_entree == NULL){
+        perror("Erreur lors de l'ouverture du fichier d'entrée");
+        exit(1);
+    }
+    Athlete fiches[100];
+    int i = 0;
+    char ligne[200];
+
+    // Lire les données depuis le fichier d'entrée
+    while (fgets(ligne, 199, fichier_entree)) {
+        if (sscanf(ligne, "%49s %d/%d/%d %49s %d %f",fiches[i].nom,
+                   &fiches[i].date.jour,
+                   &fiches[i].date.mois,
+                   &fiches[i].date.annee,
+                   fiches[i].epreuve,
+                   &fiches[i].position,
+                   &fiches[i].temps) == 7) {
+            i++;
+        }
+    }
+    fclose(fichier_entree);
+
+    // Trier les fiches par date en utilisant le tri par insertion
+    tri_insertion_date(fiches, i);
+
+    // Ouverture du fichier de sortie
+    FILE *fichier_sortie = fopen(fichier_sortie_nom, "w");
+    if (fichier_sortie == NULL){
+        perror("Erreur lors de l'ouverture du fichier de sortie");
+        exit(1);
+    }
+
+    // Écrire les fiches pour l'épreuve cible dans le fichier de sortie
+    for (int k = 0; k < i; k++) {
+        if (strcmp(fiches[k].epreuve, epreuve_cible) == 0){
+            fprintf(fichier_sortie, "%s %d/%d/%d %s %d %.2f\n",fiches[k].nom,
+                    fiches[k].date.jour,
+                    fiches[k].date.mois,
+                    fiches[k].date.annee,
+                    fiches[k].epreuve,
+                    fiches[k].position,
+                    fiches[k].temps);
+        }
+    }
+    fclose(fichier_sortie);
+}
+
 //Procédure de tri d'insertion pour trier les moyennes
 void tri_insertion_moyenne(AthleteMoyenne tab[], int n){
     int i,j;
@@ -451,7 +503,7 @@ float * recupererdonnees(char *athlete, char *epreuve) {
             }
         }
 //on crée un tableau qui sera composé des temps de l'athlète en allouant l'espace en fonction du nombre de ligne du fichier
-        float *chronos = malloc((i ) * sizeof(float));
+        float *chronos = malloc((i +1) * sizeof(float));
         if (chronos == NULL) {
             printf("erreur d'allocation de la mémoire\n");
             exit(1);
@@ -474,7 +526,6 @@ float * recupererdonnees(char *athlete, char *epreuve) {
 //fonction pour récupérer les chronos pour le relais
 float * recupererdonnees1(char *athlete, char *epreuve) {
     FILE *fichier = NULL;
-
     char nom_fichier[MAX_LONGUEUR_SAISIE];
     //le copie le nom de l'athleteb dans le nom du fichier
     strncpy(nom_fichier, athlete, MAX_LONGUEUR_SAISIE-1);
@@ -503,19 +554,18 @@ float * recupererdonnees1(char *athlete, char *epreuve) {
                        &fiches[i].temps) == 7) {
 
                 i++;
-
             }
         }
         //on crée un tableau qui sera composé des temps de l'athlète en allouant l'espace en fonction du nombre de ligne du fichier
-        float *chronos = malloc((i ) * sizeof(float));
+        float *chronos = malloc((i +1) * sizeof(float));
         if (chronos == NULL) {
             printf("erreur d'allocation de la mémoire\n");
             exit(1);
         }
         rewind(fichier);
         //on entre la taille du tableau dans la première case
-        chronos[0] = (float)i ;
-        //on rentre les chronosen commencant à la case 1
+        chronos[0] = (int)i ;
+        //on rentre les chronos en commencant à la case 1
         for (int j = 1; j <= i; j++) {
             chronos[j]=fiches[j].temps;
         }
@@ -916,9 +966,7 @@ int main() {
 
                 case 3 /* Voir Statistiques */:
                     //vérifier si l'utilisateur rentre un athlete qui existe
-                    printf("Saisir le nom de l'athlete: ");
-                    scanf("%s", athlete);
-                    /*do {
+                    do {
                         printf("Saisir le nom de l'athlete: ");
                         scanf("%s", athlete);
 
@@ -937,7 +985,7 @@ int main() {
                             printf("Le fichier sur l'athlete n'existe pas.\n");
                             viderBuffer();
                         }
-                    } while (1);*/
+                    } while (1);
                     //on alloue la place pour le nom des épreuves
                     char *epreuve = malloc(10);
                     if (epreuve == NULL) {
@@ -961,22 +1009,6 @@ int main() {
                                 strcpy(epreuve, "100m");
                                 printf("vous avez choisi l'epreuve %s\n", epreuve);
 
-                                printf("Les statistiques de l'athlete %s pour l'epreuve %s:\n", athlete, epreuve);
-                                char *fichier_sortie_epreuve = malloc(50);
-                                //on renomme la chaîne de caractère en athlète
-
-                                strcpy(fichier_sortie_epreuve, athlete);
-                                //on ajoute _ et le nom de l'épreuve à la chaîne
-                                strcat(fichier_sortie_epreuve, "_");
-                                strcat(fichier_sortie_epreuve, epreuve);
-                                //on ajoute .txt a la fin de la chaîne
-                                strcat(fichier_sortie_epreuve, ".txt");
-                                char *fichier_entree_nom = malloc(50);
-                                strcpy(fichier_entree_nom, athlete);
-                                //on ajoute .txt a la fin de nom_fichier
-                                strcat(fichier_entree_nom, ".txt");
-                                tri_epreuve_date(fichier_entree_nom, epreuve, fichier_sortie_epreuve);
-                                afficheSatistique(athlete, epreuve);
                                 char reponse;
                                 do {
                                     do {
@@ -1007,8 +1039,24 @@ int main() {
                                     scanf(" %c", &reponse);
                                 } while (reponse == 'O' || reponse == 'o');
 
-                                //on va vérifier si dans le fichier qui comporte les moyennes de tous athletes pour cette epreuve, comprend au moins 3 athlètes
+                                printf("Les statistiques de l'athlete %s pour l'epreuve %s:\n", athlete, epreuve);
+                                char *fichier_sortie_epreuve = malloc(50);
+                                //on renomme la chaîne de caractère en athlète
 
+                                strcpy(fichier_sortie_epreuve, athlete);
+                                //on ajoute _ et le nom de l'épreuve à la chaîne
+                                strcat(fichier_sortie_epreuve, "_");
+                                strcat(fichier_sortie_epreuve, epreuve);
+                                //on ajoute .txt a la fin de la chaîne
+                                strcat(fichier_sortie_epreuve, ".txt");
+                                char *fichier_entree_nom = malloc(50);
+                                strcpy(fichier_entree_nom, athlete);
+                                //on ajoute .txt a la fin de nom_fichier
+                                strcat(fichier_entree_nom, ".txt");
+                                tri_epreuve_date(fichier_entree_nom, epreuve, fichier_sortie_epreuve);
+                                afficheSatistique(athlete, epreuve);
+
+                                //on va vérifier si dans le fichier qui comporte les moyennes de tous athletes pour cette epreuve, comprend au moins 3 athlètes
                                 int i=0;
                                 FILE *fichier = fopen("statistiquess100m.txt", "r");
                                 rewind(fichier);
@@ -1039,22 +1087,7 @@ int main() {
                                 strcpy(epreuve, "400m");
                                 printf("vous avez choisi l'epreuve %s\n", epreuve);
 
-                                printf("Les statistiques de l'athlete %s pour l'epreuve %s:\n", athlete, epreuve);
-                                char *fichier_sortie_epreuve1 = malloc(50);
-                                //on renomme la chaîne de caractère en athlète
-
-                                strcpy(fichier_sortie_epreuve1, athlete);
-                                //on ajoute _ et le nom de l'épreuve à la chaîne
-                                strcat(fichier_sortie_epreuve1, "_");
-                                strcat(fichier_sortie_epreuve1, epreuve);
-                                //on ajoute .txt a la fin de nom_fichier
-                                strcat(fichier_sortie_epreuve1, ".txt");
-                                char *fichier_entree_nom1 = malloc(50);
-                                strcpy(fichier_entree_nom1, athlete);
-                                //on ajoute .txt a la fin de nom_fichier
-                                strcat(fichier_entree_nom1, ".txt");
-                                tri_epreuve_date(fichier_entree_nom1, epreuve, fichier_sortie_epreuve1);
-                                afficheSatistique(athlete, epreuve);
+                                char reponse1;
                                 do {
                                     do {
                                         printf("Entrez la date (JJ/MM/AAAA) que vous voulez observer: \n");
@@ -1081,8 +1114,26 @@ int main() {
                                     } while (valideDate(date2.jour, date2.mois, date2.annee) == 0);
                                     printf("Voulez-vous verifier la difference de temps pour d'autres dates ? (O/N): ");
 
-                                    scanf(" %c", &reponse);
-                                } while (reponse == 'O' || reponse == 'o');
+                                    scanf(" %c", &reponse1);
+                                } while (reponse1 == 'O' || reponse1 == 'o');
+
+                                printf("Les statistiques de l'athlete %s pour l'epreuve %s:\n", athlete, epreuve);
+                                char *fichier_sortie_epreuve1 = malloc(50);
+                                //on renomme la chaîne de caractère en athlète
+
+                                strcpy(fichier_sortie_epreuve1, athlete);
+                                //on ajoute _ et le nom de l'épreuve à la chaîne
+                                strcat(fichier_sortie_epreuve1, "_");
+                                strcat(fichier_sortie_epreuve1, epreuve);
+                                //on ajoute .txt a la fin de nom_fichier
+                                strcat(fichier_sortie_epreuve1, ".txt");
+                                char *fichier_entree_nom1 = malloc(50);
+                                strcpy(fichier_entree_nom1, athlete);
+                                //on ajoute .txt a la fin de nom_fichier
+                                strcat(fichier_entree_nom1, ".txt");
+                                tri_epreuve_date(fichier_entree_nom1, epreuve, fichier_sortie_epreuve1);
+                                afficheSatistique(athlete, epreuve);
+
 
                                 //on va vérifier si dans le fichier qui comporte les moyennes de tous athletes pour cette epreuve, comprend au moins 3 athlètes
                                 int i1=0;
@@ -1114,23 +1165,7 @@ int main() {
                                 //on nomme la chaîne de caractère épreuve en fonction du choix de l'épreuve
                                 strcpy(epreuve, "5000m");
                                 printf("vous avez choisi l'epreuve %s\n", epreuve);
-
-                                printf("Les statistiques de l'athlete %s pour l'epreuve %s:\n", athlete, epreuve);
-                                char *fichier_sortie_epreuve2 = malloc(50);
-                                //on renomme la chaîne de caractère en athlète
-
-                                strcpy(fichier_sortie_epreuve2, athlete);
-                                //on ajoute _ et le nom de l'épreuve à la chaîne
-                                strcat(fichier_sortie_epreuve2, "_");
-                                strcat(fichier_sortie_epreuve2, epreuve);
-                                //on ajoute .txt a la fin de nom_fichier
-                                strcat(fichier_sortie_epreuve2, ".txt");
-                                char *fichier_entree_nom2 = malloc(50);
-                                strcpy(fichier_entree_nom2, athlete);
-                                //on ajoute .txt a la fin de nom_fichier
-                                strcat(fichier_entree_nom2, ".txt");
-                                tri_epreuve_date(fichier_entree_nom2, epreuve, fichier_sortie_epreuve2);
-                                afficheSatistique(athlete, epreuve);
+                                char reponse2;
                                 do {
                                     do {
                                         printf("Entrez la date (JJ/MM/AAAA) que vous voulez observer: \n");
@@ -1157,8 +1192,26 @@ int main() {
                                     } while (valideDate(date2.jour, date2.mois, date2.annee) == 0);
                                     printf("Voulez-vous verifier la difference de temps pour d'autres dates ? (O/N): ");
 
-                                    scanf(" %c", &reponse);
-                                } while (reponse == 'O' || reponse == 'o');
+                                    scanf(" %c", &reponse2);
+                                } while (reponse2 == 'O' || reponse2 == 'o');
+
+                                printf("Les statistiques de l'athlete %s pour l'epreuve %s:\n", athlete, epreuve);
+                                char *fichier_sortie_epreuve2 = malloc(50);
+                                //on renomme la chaîne de caractère en athlète
+
+                                strcpy(fichier_sortie_epreuve2, athlete);
+                                //on ajoute _ et le nom de l'épreuve à la chaîne
+                                strcat(fichier_sortie_epreuve2, "_");
+                                strcat(fichier_sortie_epreuve2, epreuve);
+                                //on ajoute .txt a la fin de nom_fichier
+                                strcat(fichier_sortie_epreuve2, ".txt");
+                                char *fichier_entree_nom2 = malloc(50);
+                                strcpy(fichier_entree_nom2, athlete);
+                                //on ajoute .txt a la fin de nom_fichier
+                                strcat(fichier_entree_nom2, ".txt");
+                                tri_epreuve_date(fichier_entree_nom2, epreuve, fichier_sortie_epreuve2);
+                                afficheSatistique(athlete, epreuve);
+
 
                                 //on va vérifier si dans le fichier qui comporte les moyennes de tous athletes pour cette epreuve, comprend au moins 3 athlètes
                                 int i2=0;
@@ -1190,23 +1243,7 @@ int main() {
                                 //on nomme la chaîne de caractère épreuve en fonction du choix de l'épreuve
                                 strcpy(epreuve, "marathon");
                                 printf("vous avez choisi l'epreuve %s\n", epreuve);
-
-                                printf("Les statistiques de l'athlete %s pour l'epreuve %s:\n", athlete, epreuve);
-                                char *fichier_sortie_epreuve3 = malloc(50);
-                                //on renomme la chaîne de caractère en athlète
-
-                                strcpy(fichier_sortie_epreuve3, athlete);
-                                //on ajoute _ et le nom de l'épreuve à la chaîne
-                                strcat(fichier_sortie_epreuve3, "_");
-                                strcat(fichier_sortie_epreuve3, epreuve);
-                                //on ajoute .txt a la fin de nom_fichier
-                                strcat(fichier_sortie_epreuve3, ".txt");
-                                char *fichier_entree_nom3 = malloc(50);
-                                strcpy(fichier_entree_nom3, athlete);
-                                //on ajoute .txt a la fin de nom_fichier
-                                strcat(fichier_entree_nom3, ".txt");
-                                tri_epreuve_date(fichier_entree_nom3, epreuve, fichier_sortie_epreuve3);
-                                afficheSatistique(athlete, epreuve);
+                                char reponse3;
                                 do {
                                     do {
                                         printf("Entrez la date (JJ/MM/AAAA) que vous voulez observer: \n");
@@ -1233,8 +1270,27 @@ int main() {
                                     } while (valideDate(date2.jour, date2.mois, date2.annee) == 0);
                                     printf("Voulez-vous verifier la difference de temps pour d'autres dates ? (O/N): ");
 
-                                    scanf(" %c", &reponse);
-                                } while (reponse == 'O' || reponse == 'o');
+                                    scanf(" %c", &reponse3);
+                                } while (reponse3 == 'O' || reponse3 == 'o');
+
+                                printf("Les statistiques de l'athlete %s pour l'epreuve %s:\n", athlete, epreuve);
+                                char *fichier_sortie_epreuve3 = malloc(50);
+                                //on renomme la chaîne de caractère en athlète
+
+                                strcpy(fichier_sortie_epreuve3, athlete);
+                                //on ajoute _ et le nom de l'épreuve à la chaîne
+                                strcat(fichier_sortie_epreuve3, "_");
+                                strcat(fichier_sortie_epreuve3, epreuve);
+                                //on ajoute .txt a la fin de nom_fichier
+                                strcat(fichier_sortie_epreuve3, ".txt");
+                                char *fichier_entree_nom3 = malloc(50);
+                                strcpy(fichier_entree_nom3, athlete);
+                                //on ajoute .txt a la fin de nom_fichier
+                                strcat(fichier_entree_nom3, ".txt");
+
+                                tri_epreuve_date(fichier_entree_nom3, epreuve, fichier_sortie_epreuve3);
+                                afficheSatistique(athlete, epreuve);
+
                                 //on va vérifier si dans le fichier qui comporte les moyennes de tous athletes pour cette epreuve, comprend au moins 3 athlètes
                                 int i3=0;
                                 FILE *fichier3 = fopen("statistiquess100m.txt", "r");
@@ -1280,9 +1336,9 @@ int main() {
                                 strcpy(fichier_entree_nom4, athlete);
                                 //on ajoute .txt a la fin de nom_fichier
                                 strcat(fichier_entree_nom4, ".txt");
-                                tri_epreuve_date(fichier_entree_nom4, epreuve, fichier_sortie_epreuve4);
+                                tri_epreuve_date1(fichier_entree_nom4, epreuve, fichier_sortie_epreuve4);
                                 afficheSatistique1(athlete, epreuve);
-
+                                char reponse4;
                                 do {
                                     do {
                                         printf("Entrez la date (JJ/MM/AAAA) que vous voulez observer: \n");
@@ -1309,8 +1365,8 @@ int main() {
                                     } while (valideDate(date2.jour, date2.mois, date2.annee) == 0);
                                     printf("Voulez-vous verifier la difference de temps pour d'autres dates ? (O/N): ");
 
-                                    scanf(" %c", &reponse);
-                                } while (reponse == 'O' || reponse == 'o');
+                                    scanf(" %c", &reponse4);
+                                } while (reponse4 == 'O' || reponse4 == 'o');
                                 break;
 
                             default:
@@ -1320,7 +1376,7 @@ int main() {
                                 break;
                         }
                     }while (n_epreuve < 1 || n_epreuve > 5);
-
+                    break;
                 case 4 /* Quitter */:
                     printf("4 \n");
                     break;
