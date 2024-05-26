@@ -92,12 +92,14 @@ prend en paramètre le nom de l'épreuve et utilise la
 fonction tri_moyennes pour trier les moyennes des athlètes dans l'ordre croissant.
 Ensuite, elle lit les trois premières lignes du fichier trié pour afficher les trois
 meilleurs athlètes avec leur moyenne de temps dans cette épreuve.
-La procédure differenceTempsDates prend en paramètres le nom de l'athlète, le nom
+#### La procédure differenceTempsDates 
+prend en paramètres le nom de l'athlète, le nom
 de l'épreuve, ainsi que deux dates. Elle extrait les chronos de l'athlète pour l'épreuve
 spécifiée aux deux dates données, puis calcule et affiche la différence de temps entre
 ces deux chronos.
-La procédure differenceTempsDates1 fonctionne de manière similaire à
-differenceTempsDates, mais elle est spécifiquement conçue pour les épreuves de
-relais. Elle prend en paramètres le nom de l'athlète, le nom de l'épreuve de relais,
-ainsi que deux dates, extrait les chronos de l'athlète pour le relais spécifié aux deux
+#### La procédure differenceTempsDates1 
+fonctionne de manière similaire à differenceTempsDates, 
+mais elle est spécifiquement conçue pour les épreuves de relais. Elle prend en paramètres 
+le nom de l'athlète, le nom de l'épreuve de relais, ainsi que deux dates, 
+extrait les chronos de l'athlète pour le relais spécifié aux deux
 dates données, puis calcule et affiche la différence de temps entre ces deux chronos.
